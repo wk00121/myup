@@ -301,7 +301,7 @@ $(document).ready(function(){
 				  <div class="panel-body">
 					
 					<div style="line-height:25px">
-					软件：银联OA<br>
+					软件：银联oA<br>
 					官网：<a href="http://www.unionpay.com/" target="_blank">http://www.unionpay.com/</a><br>
 					版本：V<span id="banben">1.0</span><br>
 					下载：服务端，PC客户端，APP<a href="http://xh829.com/view_down.html" target="_blank">[去下载]</a><br>

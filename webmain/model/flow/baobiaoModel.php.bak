@@ -24,7 +24,7 @@ class flow_baobiaoClassModel extends flowModel
 		$rs['ring'] 		= str_replace("\n",'<br>', $rs['ring']);
 		$rs['year'] 		= str_replace("\n",'<br>', $rs['year']);
 		$rs['priority'] 		= str_replace("\n",'<br>', $rs['priority']);
-	  $rs['ustatus'] 		= str_replace("\n",'<br>', $rs['ustatus']);
+	  $rs['status'] 		= str_replace("\n",'<br>', $rs['status']);
 		$rs['nextstage'] 		= str_replace("\n",'<br>', $rs['nextstage']);
 		$rs['respond'] 		= str_replace("\n",'<br>', $rs['respond']);
 		$rs['helper'] 		= str_replace("\n",'<br>', $rs['helper']);

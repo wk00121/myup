@@ -1,0 +1,2 @@
+main/baobiao/publicstore,[错误SQL]：《SELECT count(1) FROM `up_baobiao` a left join `up_admin` WHERE 1=1   and a.uid=1》----------原因：You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near 'WHERE 1=1   and a.uid=1' at line 1
+URL：a=publicstore&m=baobiao&d=main&ajaxbool=true&rnd=0.5155924959108233

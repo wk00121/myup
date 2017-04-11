@@ -1,0 +1,2 @@
+flow/mode_baobiao|input/save,[错误SQL]：《SELECT count(1) FROM up_baobiao WHERE id<>4 and `uid`=1 and `type`='0' and `dt`='2017-04-11' and `enddt`=2017-05-31 00:00:00》----------原因：You have an error in your SQL syntax; check the manual that corresponds to your MySQL server version for the right syntax to use near '00:00:00' at line 1
+URL：a=save&m=mode_baobiao|input&d=flow&ajaxbool=true&rnd=0.6857828688807786

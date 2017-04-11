@@ -22,15 +22,15 @@ $(document).ready(function(){
 		},{
 			text:'银联收入',dataIndex:'upincome'
 		},{
-			text:'交易量环比变化',dataIndex:'ring',align:'left'
+			text:'交易量环比',dataIndex:'ring',align:'left'
 		},{
-			text:'交易量同比变化',dataIndex:'year',align:'left'
+			text:'交易量同比',dataIndex:'year',align:'left'
 		},{
 			text:'优先级',dataIndex:'priority',align:'left',sortable:true,renderer:function(v){
 				return v.replace(' ','<br>');
 			}
 		},{
-			text:'现状',dataIndex:'status',align:'left'
+			text:'项目当前进展状况',dataIndex:'ustatus',align:'left'
 		},{
 			text:'下阶段进展及存在问题',dataIndex:'nextstage',align:'left'
 		},{
