@@ -1,0 +1,2 @@
+main/baobiao/publicstore,[错误SQL]：《SELECT count(1) FROM `up_baobiao` a left join `up_admin` b on a.`uid`=b.`id` WHERE 1=1   and a.uid=1 and a.`dt` like '2017-04-09%' and (b.`name` like '%300%' or b.`user` like '%300%' or b.`deptallname` like '%300%' or b.`ranking` like '%300%' or b.`pingyin` like '300%' or a.`content` like '%300%')》----------原因：Unknown column 'a.content' in 'where clause'
+URL：a=publicstore&m=baobiao&d=main&ajaxbool=true&rnd=0.04230309324339032
