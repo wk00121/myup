@@ -8,7 +8,7 @@ $(document).ready(function(){
 		window:false,rand:'{rand}',tablename:'flow_element',
 		url:publicsave('{mode}','{dir}'),
 		params:{otherfields:'mid='+mid+''},
-		submitfields:'name,fields,fieldstype,dev,savewhere,sort,islu,isbt,iszs,data,iszb,attr,lens',
+		submitfields:'name,fields,fieldstype,dev,savewhere,sort,ispx,isalign,issou,islu,islb,isbt,iszs,data,iszb,attr,lens',
 		requiredfields:'name,fields,fieldstype,lens',aftersaveaction:'elemensavefields',beforesaveaction:'elemensavefieldsbefore',
 		success:function(){
 			closenowtabs();
@@ -106,6 +106,8 @@ $(document).ready(function(){
 		<tr>
 			<td align="right">排序号：</td>
 			<td class="tdinput"><input name="sort" value="0" maxlength="3" type="number"  onfocus="js.focusval=this.value" onblur="js.number(this)" class="form-control"></td>
+			<td align="right">对齐方式：</td>
+			<td class="tdinput"><select name="isalign" class="form-control"><option value="0">居中</option><option value="1">居左</option><option value="2">居右</option></select></td>
 		</tr>
 	
 		
@@ -115,6 +117,9 @@ $(document).ready(function(){
 				<label><input name="islu" value="1" checked type="checkbox"> 录入列?</label>&nbsp; &nbsp; 
 				<label><input name="isbt" value="1" checked type="checkbox"> 是否必填</label>&nbsp; &nbsp; 
 				<label><input name="iszs" value="1" checked type="checkbox"> 展示列</label>&nbsp; &nbsp; 
+				<label><input name="islb" value="1" checked type="checkbox"> 列表列</label>&nbsp; &nbsp; 
+				<label><input name="ispx" value="0" type="checkbox"> 列表列排序</label>&nbsp; &nbsp; 
+				<label><input name="issou" value="0" type="checkbox"> 可搜索筛选</label>&nbsp; &nbsp; 
 			</td>
 		</tr>
 

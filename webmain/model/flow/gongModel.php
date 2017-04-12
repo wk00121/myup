@@ -1,13 +1,27 @@
 <?php
 class flow_gongClassModel extends flowModel
 {
+	public function initModel()
+	{
+		$this->logobj = m('log');
+	}
+	
 	protected function flowchangedata(){
 		$cont 	= c('html')->replace($this->rs['content']);
 		$fm 	= $this->rs['fengmian'];
 		if(!isempt($fm) && file_exists($fm)){
-			$cont='<div align="center"><img src="'.$fm.'"></div>'.$cont.'';
+			$cont='<div align="center"><img style="max-width:500px" src="'.$fm.'"></div>'.$cont.'';
 		}
 		$this->rs['content'] = $cont;
+	}
+	
+	public function flowrsreplace($rs, $lx=0)
+	{
+		if($lx==2){
+			$zt = $this->logobj->isread($this->mtable, $rs['id'], $this->adminid);
+			if($zt>0)$rs['ishui']=1;
+		}
+		return $rs;
 	}
 	
 	protected function flowsubmit($na, $sm)
@@ -65,20 +79,15 @@ class flow_gongClassModel extends flowModel
 	{
 		$s 		= m('admin')->getjoinstr('receid', $uid);
 		$key 	= $this->rock->post('key');
-		if($lx=='wfb'){
-			$s =' and `optid`='.$this->adminid.'';
-		}
-		if($lx=='wexx'){
-			$ydid 	= m('log')->getread('infor', $uid);
-			$s 		= 'and id not in('.$ydid.') '.$s.' ';
-		}
+		$keywere= '';
+	
 		
-		if(!isempt($key))$s.=" and (`title` like '%$key%' or `typename`='$key')";
+		if(!isempt($key))$keywere.=" and (`title` like '%$key%' or `typename`='$key')";
 		
 		return array(
-			'where' => 'and `status`=1 '.$s,
-			'order' => 'optdt desc',
-			'fields'=> 'id,typename,optdt,title,optname,zuozhe,indate,recename,fengmian'
+			'order' 	=> 'optdt desc',
+			'keywere' 	=> $keywere,
+			'fields'	=> 'id,typename,optdt,title,optname,zuozhe,indate,recename,fengmian'
 		);
 	}
 }

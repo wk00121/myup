@@ -6,6 +6,7 @@
 *	Copyright (c) 2016 rainrock (xh829.com)
 *	Date:2016-11-01
 *	explain：返回200为正常
+*	post需开启：always_populate_raw_post_data = On
 */
 class openapiAction extends ActionNot
 {

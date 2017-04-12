@@ -24,9 +24,9 @@ if(!defined('PROJECT'))define('PROJECT', $rock->get('p', 'webmain'));
 if(!defined('ENTRANCE'))define('ENTRANCE', 'index');
 error_reporting(DEBUG ? E_ALL : 0);
 $config		= array(
-	'title'		=> '银联',
+	'title'		=> '信呼',
 	'url'		=> 'http://'.HOST.'/app/xinhu/',
-	'urly'		=> 'http://www.unionpay.com/',
+	'urly'		=> 'http://xh829.com/',
 	'db_host'	=> '',
 	'db_user'	=> '',
 	'db_pass'	=> '',

@@ -1,5 +1,5 @@
 <?php
-class inputAction extends ActionNot
+class inputAction extends Action
 {
 	public $mid = 0;
 	public $flow;
@@ -7,11 +7,12 @@ class inputAction extends ActionNot
 	
 	public function initAction()
 	{
+		/*
 		$aid 	= (int)$this->get('adminid');
 		$token 	= $this->get('token');
 		$uid 	= m('login')->autologin($aid, $token);
 		$this->getlogin();
-		$this->loginnot();
+		$this->loginnot();*/
 	}
 	
 	private $fieldarr = array();
@@ -279,9 +280,18 @@ class inputAction extends ActionNot
 		$fields	= str_replace(',',"','", $fields);
 		$stwhe	= "and `fields` in('$fields')";
 		$this->luactions(1, $stwhe);
-	}	
+	}
+
+	//高级搜索显示框
+	public function highsouAction()
+	{
+		$this->displayfile = ''.P.'/flow/input/tpl_input_lus.html';
+		$this->ismobile = 1;
+		$this->luactions(0, '', 1);
+	}
 	
-	private function luactions($slx=0, $stwhe='')
+	//$lutype=1高级搜索用的
+	private function luactions($slx=0, $stwhe='', $lutype=0)
 	{
 		$this->tpltype = 'html';
 		$uid		= $this->adminid;
@@ -299,7 +309,7 @@ class inputAction extends ActionNot
 			'isflow'=> $moders['isflow'],
 		);
 		$modeid 	= $moders['id'];
-		if($mid==0){
+		if($mid==0 && $lutype==0){
 			$isadd = m('view')->isadd($modeid, $uid);
 			if(!$isadd)exit('无权添加['.$moders['name'].']的数据;');
 		}
@@ -309,14 +319,19 @@ class inputAction extends ActionNot
 		$this->rs 	= $oldrs;
 
 		
-		$fieldarr 	= m('flow_element')->getrows("`mid`='$modeid' and `iszb`=0 $stwhe",'fields,fieldstype,name,dev,data,isbt,islu,attr,iszb','`sort`');
+		$fieldarr 	= m('flow_element')->getrows("`mid`='$modeid' and `iszb`=0 $stwhe",'fields,fieldstype,name,dev,data,isbt,islu,attr,iszb,issou','`sort`');
 		$modelu		= '';
 		foreach($fieldarr as $k=>$rs){
 			if($slx==1 && $oldrs){
 				$rs['value'] = $oldrs[$rs['fields']];
 			}
+			if($lutype==1){
+				$rs['isbt'] = 0;
+				if($rs['issou']==1)$modelu.='{'.$rs['fields'].'}';
+			}else{	
+				if($rs['islu'] || $stwhe!='')$modelu.='{'.$rs['fields'].'}';
+			}
 			$this->fieldarr[$rs['fields']] = $rs;
-			if($rs['islu'] || $stwhe!='')$modelu.='{'.$rs['fields'].'}';
 		}
 		
 		$this->smartydata['fieldsjson']	= json_encode($fieldarr);
@@ -376,7 +391,7 @@ class inputAction extends ActionNot
 		
 		$course			= array();
 		$nowcourseid	= 0;
-		if($moders['isflow']==1){
+		if($moders['isflow']==1 && $lutype==0){
 			$course[]= array('name'=>'提交','id'=>0);
 			$courses	= $this->flow->getflowpipei();
 			if($mid>0){
@@ -440,6 +455,41 @@ class inputAction extends ActionNot
 			$rows = $this->$act();
 		}
 		$this->returnjson($rows);
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	//展示列数
+	public function storeaftershow($table, $rows)
+	{
+		return array(
+			'rows' => $rows
+		);
+	}
+	
+	//获取可搜索列表
+	public function getcolumnsAjax()
+	{
+		$modeid 	= (int)$this->get('modeid');
+		$modenum 	= $this->get('modenum');
+		$flow 		= m('flow')->initflow($modenum);
+
+		$souarr 	= array();
+		$this->input= c('input');
+		foreach($flow->fieldsarra as $k=>$rs){
+			
+			if($rs['issou']==1){
+				$rs['store'] = $this->input->getdatastore($rs['fieldstype'], $this, $rs['data']);
+				$souarr[] = $rs;
+			}
+		}
+		$this->returnjson($souarr);
 	}
 }
 

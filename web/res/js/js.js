@@ -253,6 +253,7 @@ js.downshow=function(id){
 	return false;
 }
 js.formatsize=function(size){
+	if(size<=0)return '0 KB';
 	var arr = new Array('Byte', 'KB', 'MB', 'GB', 'TB', 'PB');
 	var e	= Math.floor(Math.log(size)/Math.log(1024));
 	var fs	= size/Math.pow(1024,Math.floor(e));

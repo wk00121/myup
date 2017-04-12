@@ -1,0 +1,1 @@
+[2017-04-12 07:03:44]:alter table `up_flow_element` add `islb` tinyint(1) DEFAULT '1' COMMENT '是否列表列',add `ispx` tinyint(1) DEFAULT '0' COMMENT '是否可排序',add `isalign` tinyint(1) DEFAULT '0' COMMENT '0居中,1居左,2居右',add `issou` tinyint(1) DEFAULT '0' COMMENT '是否可搜索'

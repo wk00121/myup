@@ -1,0 +1,1 @@
+[2017-04-12 07:03:44]:alter table `up_flow_where` add `islb` tinyint(1) DEFAULT '0' COMMENT '是否在生成列表页面上显示',add `status` tinyint(1) DEFAULT '1' COMMENT '状态'

@@ -101,11 +101,15 @@ class agentModel extends Model
 		return $rows;
 	}
 	
+	/**
+	*	应用上获取数据
+	*/
 	public function getdatalimit($uid, $lx)
 	{
 		if(!$this->flow)return array();
 		$nas 	= $this->flow->billwhere($uid, $lx);
 		$_wehs	= $nas['where'];
+		
 		$where 	= '1=1 '.$_wehs.'';
 		$fields = '*';
 		$order  = '';

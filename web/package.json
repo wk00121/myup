@@ -1,7 +1,7 @@
 ﻿{
 	"main": "login.html",
 	"name": "rockxinhu",
-	"description": "银联安徽，中国银联安徽分公司，by http://www.unionpay.com/",
+	"description": "信呼，一款开源的工作办公软件，by http://xh829.com/",
 	"version": "1.2.2",
 	"node-remote":"http://127.0.0.1/",
 	"window": {

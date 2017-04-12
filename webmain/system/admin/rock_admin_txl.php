@@ -2,8 +2,7 @@
 <script >
 $(document).ready(function(){
 	var a = $('#admin_{rand}').bootstable({
-		tablename:'admin',sort:'sort',dir:'asc',fanye:true,
-		storebeforeaction:'tongxlbeforeshow',modedir:'{mode}:{dir}',
+		modenum:'user',sort:'sort',dir:'asc',fanye:true,
 		columns:[{
 			text:'头像',dataIndex:'face',notexcel:true,renderer:function(v,d){
 				if(isempt(v))v='images/noface.png';
@@ -37,7 +36,10 @@ $(document).ready(function(){
 		changlx:function(o1,lx){
 			$("button[id^='state{rand}']").removeClass('active');
 			$('#state{rand}_'+lx+'').addClass('active');
-			a.setparams({zt:lx},true);
+			var atype = 'my';
+			if(lx=='0')atype = 'down';
+			if(lx=='1')atype = 'downall';
+			a.setparams({atype:atype},true);
 		}
 	};
 	js.initbtn(c);
@@ -64,6 +66,7 @@ $(document).ready(function(){
 		<div class="btn-group" id="btngroup{rand}">
 		<button class="btn btn-default active" id="state{rand}_" click="changlx," type="button">全部</button>
 		<button class="btn btn-default" id="state{rand}_0" click="changlx,0" type="button">我直属下属</button>
+		<button class="btn btn-default" id="state{rand}_1" click="changlx,1" type="button">全部下属</button>
 		</div>	
 	</td>
 	<td align="right" nowrap>

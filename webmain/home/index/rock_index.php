@@ -201,10 +201,10 @@ $(document).ready(function(){
 	}
 	
 	moregonggao=function(){
-		addtabs({num:'gong',url:'system,infor,geren',icons:'volume-up',name:'通知公告'});
+		addtabs({num:'gong',url:'flow,page,gong,atype=my',icons:'volume-up',name:'通知公告'});
 	}
 	moremeets=function(){
-		addtabs({num:'meet',url:'main,fwork,meet,atype=my',name:'今日会议'});
+		addtabs({num:'meet',url:'flow,page,meet,atype=today',name:'今日会议'});
 	}
 	moemyapplylist=function(){
 		addtabs({num:'applymy',url:'main,fwork,bill,atype=my',icons:'align-left',name:'我的申请'});
@@ -296,13 +296,13 @@ $(document).ready(function(){
 				
 				<div class="panel panel-success">
 				  <div class="panel-heading">
-					<h3 class="panel-title">关于银联OA</h3>
+					<h3 class="panel-title">关于信呼</h3>
 				  </div>
 				  <div class="panel-body">
 					
 					<div style="line-height:25px">
-					软件：银联OA<br>
-					官网：<a href="http://www.unionpay.com/" target="_blank">http://www.unionpay.com/</a><br>
+					软件：信呼<br>
+					官网：<a href="http://xh829.com/" target="_blank">http://xh829.com/</a><br>
 					版本：V<span id="banben">1.0</span><br>
 					下载：服务端，PC客户端，APP<a href="http://xh829.com/view_down.html" target="_blank">[去下载]</a><br>
 					声明：我们是开源的，请遵守我们的<a href="http://xh829.com/view_version.html" target="_blank">开源协议</a>，谢谢！<br>
@@ -371,6 +371,6 @@ $(document).ready(function(){
 		</table>
 	</div>
 	
-	<div class="tishi" align="center">Copyright ©2017 unionpay.com 银联办公系统 技术支持：<a href="http://www.unionpay.com/" target="_blank">银联OA开发团队</a></div>
+	<div class="tishi" align="center">Copyright ©2017 xh829.com开源信呼办公系统 技术支持：<a href="http://xh829.com/" target="_blank">信呼开发团队</a></div>
 	
 </div>

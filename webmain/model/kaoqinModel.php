@@ -16,7 +16,7 @@ class kaoqinClassModel extends Model
 		$kqa 	= m('admin')->getusinfo($uid,'dkip,dkmac');
 		$mac	= strtolower($mac);
 		if(isempt($kqa['dkip']) && isempt($kqa['dkmac']))return '未设置打卡IP或MAC地址';
-		if(!isempt($kqa['dkip'])){
+		if(!isempt($kqa['dkip']) && $kqa['dkip']!='*'){
 			$ass 	= explode(',', $kqa['dkip']);
 			if(!in_array($ip, $ass))return '打卡电脑内网IP必须是：'.$kqa['dkip'].'';
 		}
@@ -492,5 +492,13 @@ class kaoqinClassModel extends Model
 			}
 		}
 		return $tot / 3600;
+	}
+	
+	/**
+	*	统计月份应上班天数
+	*/
+	public function getsbdt($uid, $month)
+	{
+		
 	}
 }

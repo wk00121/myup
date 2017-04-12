@@ -9,7 +9,7 @@ class fworkClassAction extends Action
 		$viewobj = m('view');
 		foreach($rows as $k=>$rs){
 			$lx = $rs['type'];
-			if(!$viewobj->isadd($rs['id'], $this->adminid))continue;
+			if(!$viewobj->isadd($rs, $this->adminid))continue;
 			if(!isset($row[$lx]))$row[$lx]=array();
 			$row[$lx][] = $rs;
 		}
@@ -45,6 +45,15 @@ class fworkClassAction extends Action
 		
 		if($lx=='mywtg'){
 			$where.=" and a.status=2";
+		}
+		
+		//授权单据查看
+		if($lx=='grantview'){
+			$where =' and 1=2';
+			if($modeid>0){
+				$moders	= m('flow_set')->getone($modeid);
+				$where 	= m('view')->viewwhere($moders, $uid);
+			}
 		}
 		
 		if($zt!='')$where.=" and a.status='$zt'";

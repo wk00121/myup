@@ -105,16 +105,21 @@ var c={
 		if(ismobile==1)js.msg('msg', msg);
 	},
 	selectdatadata:{},
+	onselectdata:{},
 	selectdata:function(s1,ced,fid,tit){
 		if(isedit==0)return;
 		if(!tit)tit='请选择...';
 		var a1 = s1.split(',');
 		$.selectdata({
 			data:this.selectdatadata[fid],title:tit,
+			fid:fid,
 			url:geturlact('getselectdata',{act:a1[0]}),
 			checked:ced, nameobj:form(fid), idobj:form(a1[1]),
 			onloaddata:function(a){
 				c.selectdatadata[fid]=a;
+			},
+			onselect:function(seld,sna,sid){
+				if(c.onselectdata[this.fid])c.onselectdata[this.fid](seld,sna,sid);
 			}
 		});
 	},

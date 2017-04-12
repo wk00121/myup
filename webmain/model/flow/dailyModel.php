@@ -4,6 +4,7 @@ class flow_dailyClassModel extends flowModel
 	public function initModel()
 	{
 		$this->typearr = explode(',','日报,周报,月报,年报');
+		$this->logobj = m('log');
 	}
 	
 	protected function flowchangedata()
@@ -11,12 +12,27 @@ class flow_dailyClassModel extends flowModel
 		$this->rs['typess'] 	= $this->typearr[$this->rs['type']];
 	}
 	
-	public function flowrsreplace($rs)
+	public function flowrsreplace($rs, $lx=0)
 	{
+		if($rs['mark']=='0')$rs['mark'] = '';
+		if($lx==2){
+			if(isset($rs['optdt']))$rs['optdt']	= str_replace(' ','<br>', $rs['optdt']);
+			if(isset($rs['adddt']))$rs['adddt']	= str_replace(' ','<br>', $rs['adddt']);
+			
+			$zt = $this->logobj->isread('daily', $rs['id'], $this->adminid);
+			$status = 1;
+			if($zt>0)$status=0;
+			$rs['status']		= $status;
+			
+			$dt 	= $rs['dt'];
+			if($rs['type']!=0 && !isempt($rs['enddt'])){
+				$dt.='<br><font color="#aaaaaa">'.$rs['enddt'].'</font>';
+			}
+			$rs['dt'] = $dt;
+		}
 		$rs['content'] 		= str_replace("\n",'<br>', $rs['content']);
 		$rs['plan'] 		= str_replace("\n",'<br>', $rs['plan']);
 		$rs['type'] 		= $this->typearr[$rs['type']];
-		if($rs['mark']=='0')$rs['mark'] = '';
 		return $rs;
 	}
 	
@@ -95,30 +111,27 @@ class flow_dailyClassModel extends flowModel
 		return $rows;
 	}
 	
+	//条件过滤已从流程模块条件下设置
 	protected function flowbillwhere($uid, $lx)
 	{
 		$type 	= $this->rock->post('type');
 		$key 	= $this->rock->post('key');
 		$dt 	= $this->rock->post('dt');
-		$where 		= 'and a.uid='.$uid.'';
+		$where 		= '';
+		$keywhere 	= '';
 		
-		//全部下属
-		if($lx == 'undall' || $lx == 'undwd'){
-			$where  = 'and '.m('admin')->getdownwheres('a.uid', $uid, 0); //全部下属
-			if($lx == 'undwd'){
-				$ydid  	= m('log')->getread('daily', $uid); 
-				$where.=' and a.id not in('.$ydid.')';
-			}
-		}
 
 		if(!isempt($type))$where.=" and a.`type`='$type'";
 		if(!isempt($dt))$where.=" and a.`dt` like '$dt%'";
-		if(!isempt($key))$where.=m('admin')->getkeywhere($key, 'b.', "or a.`content` like '%$key%'");
+		
+		if(!isempt($key))$keywhere=m('admin')->getkeywhere($key, 'b.', "or a.`content` like '%$key%'");
 		
 		return array(
 			'table' => '`[Q]daily` a left join `[Q]admin` b on a.`uid`=b.`id`',
 			'fields'=> 'a.*,b.`name`,b.`deptname`',
 			'where' => $where,
+			'keywhere' => $keywhere,
+			'asqom' => 'a.', //主表别名
 			'order' => 'a.`optdt` desc'
 		);
 	}

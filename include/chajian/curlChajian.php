@@ -4,6 +4,8 @@
 */
 class curlChajian extends Chajian{
 	
+	private $TIMEOUT	= 30;
+	
 	private function strurl($url)
 	{
 		$url = str_replace('&#47;', '/', $url);
@@ -63,7 +65,7 @@ class curlChajian extends Chajian{
 		if($ishttps==1){
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
-		curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
+		curl_setopt($ch, CURLOPT_TIMEOUT, $this->TIMEOUT); 
 		$output = curl_exec($ch);
 		curl_close($ch);
 		return $output;
@@ -88,7 +90,7 @@ class curlChajian extends Chajian{
 		if($ishttps==1){
 			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		}
-		curl_setopt($ch, CURLOPT_TIMEOUT, 30); 
+		curl_setopt($ch, CURLOPT_TIMEOUT, $this->TIMEOUT); 
 		$output = curl_exec($ch);
 		$curl_errno = curl_errno($ch);
 		curl_close($ch);

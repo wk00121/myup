@@ -4,6 +4,8 @@ class viewClassModel extends Model
 	private $modeid = 0;
 	private $isflow = 0;
 	
+	private $ursarr	= array();
+	
 	public function initModel()
 	{
 		$this->settable('flow_extent');
@@ -13,7 +15,12 @@ class viewClassModel extends Model
 	private function getursss($mid, $uid=0)
 	{
 		if($uid==0)$uid = $this->adminid;
-		$this->urs 	= $this->db->getone('[Q]admin',$uid, 'id,name,deptpath,deptid,`type`');
+		if(isset($this->ursarr[$uid])){
+			$this->urs	= $this->ursarr[$uid];
+		}else{
+			$this->urs 	= $this->db->getone('[Q]admin',$uid, 'id,name,deptpath,deptid,`type`');
+			$this->ursarr[$uid] = $this->urs;
+		}
 		if(is_array($mid)){
 			$this->modrs = $mid;
 		}else{
@@ -25,6 +32,7 @@ class viewClassModel extends Model
 		}
 	}
 	
+	//返回可查看条件
 	public function viewwhere($mid, $uid=0, $ufid='')
 	{
 		$this->getursss($mid, $uid);
@@ -77,13 +85,20 @@ class viewClassModel extends Model
 			if($sw=='{receid}'){
 				$sw = $this->addb->getjoinstr('receid', $this->urs, 1);
 			}
+			//我所有下属的下属
 			if($sw=='{allsuper}'){
-				$sw = "`$ufid` in(select `id` from `[Q]admin` where instr(superpath,'[$uid]')>0)";
+				$sw = "`$ufid` in(select `id` from `[Q]admin` where instr(`superpath`,'[$uid]')>0)";
 			}
+			//我的直属下属
 			if($sw=='{super}'){
 				$sw1= $this->rock->dbinstr('superid',$uid);
 				$sw = "`$ufid` in(select `id` from `[Q]admin` where $sw1)";
 			}
+			//同一个部门下人员
+			if($sw=='{dept}' && !isempt($this->urs['deptid'])){
+				$sw = "`$ufid` in(select `id` from `[Q]admin` where `deptid`=".$this->urs['deptid'].")";
+			}
+			//所有数据
 			if($sw=='all'){
 				return ' and 1=1';
 			}

@@ -25,9 +25,7 @@ class reimClassModel extends Model
 		$this->serverhosturl	= $dbs->getval('reimhostsystem');
 		$this->servertitle		= $dbs->getval('reimtitlesystem');
 		$this->wxcorpid			= $dbs->getval('weixin_corpid');
-		$_chatsecret			= $dbs->getval('weixin_chatsecret');
 		$this->wxchattb			= (int)$dbs->getval('weixin_chattb','0');
-		if(isempt($_chatsecret))$this->wxchattb = 0;
 		if(getconfig('systype')=='demo')$this->serverhosturl = $this->rock->jm->base64decode('d3M6Ly93d3cueGg4MjkuY29tOjY1NTIv');
 		if($this->isempt($this->servertitle))$this->servertitle='信呼';
 	}
@@ -317,6 +315,20 @@ class reimClassModel extends Model
 		$dbs 	= m('im_menu');
 		$mdbs 	= m('menu');
 		$barr	= $carr = array();
+		
+		$allmenu = $dbs->getall("1=1",'`pid`,`mid`,`id`,`name`,`type`,`url`,`num`,`color`','`sort`');
+		$cmenu	 = array();
+		foreach($allmenu as $k=>$rs){
+			if($rs['pid']=='0'){
+				$submenu	= array();
+				foreach($allmenu as $k1=>$rs1){
+					if($rs1['pid']==$rs['id'])$submenu[] = $rs1;
+				}
+				$rs['submenu'] = $submenu;
+				$cmenu[$rs['mid']][] = $rs;
+			}
+		}
+
 		foreach($rows as $k=>$rs){
 			if(isempt($rs['num']))continue;
 			
@@ -327,8 +339,8 @@ class reimClassModel extends Model
 			$stotal			= $btosr['stotal'];
 			$rs['titles'] 	= $btosr['titles'];
 		
-			$menu	= $dbs->getall("mid='".$rs['id']."' and `pid`=0",'`id`,`name`,`type`,`url`,`num`,`color`','`sort`', 3);
-			foreach($menu as $k1=>$rs1)$menu[$k1]['submenu'] = $dbs->getall("pid='".$rs1['id']."'",'`id`,`name`,`type`,`url`,`num`,`color`','`sort`');
+			$menu			= array();
+			if(isset($cmenu[$rs['id']]))$menu = $cmenu[$rs['id']];
 			$rs['menu'] 	= $menu;
 			
 			$rs['stotal'] 	= $stotal;
@@ -347,7 +359,9 @@ class reimClassModel extends Model
 		}
 		foreach($barr as $k=>$rs){
 			$types = $rs['types'];
+			if(isempt($types))$types='应用';
 			if(!isset($carr[$types]))$carr[$types]=array();
+			$rs['types']	= $types;
 			$carr[$types][] = $rs;
 		}
 		$barr = array();
@@ -382,7 +396,9 @@ class reimClassModel extends Model
 		
 		foreach($barr as $k=>$rs){
 			$types = $rs['types'];
+			if(isempt($types))$types='应用';
 			if(!isset($carr[$types]))$carr[$types]=array();
+			$rs['types']	= $types;
 			$carr[$types][] = $rs;
 		}
 		$barr = array();
@@ -860,11 +876,21 @@ class reimClassModel extends Model
 		if($type == 'group'){
 			$arr 	= $this->sendgroup($sendid, $gid, $cans, $lx);
 		}
+		
+		//同步消息必须用异步
 		if($this->wxchattb==1 && isset($arr['id'])){
 			$msgid 	= $arr['msgid'];
-			if(isempt($msgid))$this->asynurl('asynrun','wxchattb', array(
-				'id' => $arr['id']
-			));
+			if(isempt($msgid)){
+				if(!isempt($this->optiondb->getval('weixin_chatsecret'))){
+					$this->asynurl('asynrun','wxchattb', array(
+						'id' => $arr['id']
+					));
+				}else if(!isempt($this->optiondb->getval('weixin_kefusecret'))){
+					if($type == 'user')$this->asynurl('asynrun','wxkefutb', array(
+						'id' => $arr['id']
+					));
+				}
+			}
 		}
 		return $arr;
 	}
@@ -938,6 +964,15 @@ class reimClassModel extends Model
 		$carr['receid'] 	= $receid;
 		foreach($conarr as $k=>$v)$carr[$k]=$v;
 		return $this->pushserver('send', $carr);
+	}
+	
+	/**
+	*	推送发送命令类型
+	*/
+	public function sendcmd($receid, $conarr=array())
+	{
+		$conarr['type'] = 'cmd';
+		return $this->sendpush($this->adminid, $receid, $conarr);
 	}
 	
 	/**
@@ -1200,7 +1235,7 @@ class reimClassModel extends Model
 		$gid 			= 0;
 		$optdt 			= date('Y-m-d H:i:s', $arr['CreateTime']);
 		$cont 			= '';
-		if($Type=='single'){
+		if($Type=='single' || $Type=='userid'){
 			$gid = (int)m('admin')->getmou('id', "`user`='".$arr['Id']."'");
 			$type= 'user';
 		}

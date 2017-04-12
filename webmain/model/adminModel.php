@@ -305,9 +305,16 @@ class adminClassModel extends Model
 		return $face;
 	}
 	
+	/**
+	*	获取人员数据
+	*/
 	public function getuser($lx=0)
 	{
-		$rows = $this->getall("`status`=1",'id,name,deptid,deptname,deptallname,mobile,ranking,tel,face,sex,email,pingyin','sort,name');
+		$uid  = $this->adminid;
+		$where= m('view')->viewwhere('user', $uid, 'id');
+		$fields = '`id`,`name`,`deptid`,`deptname`,`deptpath`,`deptallname`,`mobile`,`ranking`,`tel`,`face`,`sex`,`email`,`pingyin`';
+		//读取我可查看权限
+		$rows = $this->getall("`status`=1 and ((1 $where) or (`id`='$uid'))",$fields,'sort,name');
 		$py   = c('pingyin');
 		foreach($rows as $k=>$rs){
 			$rows[$k]['face'] = $this->getface($rs['face']);
@@ -348,7 +355,10 @@ class adminClassModel extends Model
 	
 	
 	
-	
+	public function getidtouser($id)
+	{
+		return $this->getmou('user', "`id`='$id'");
+	}
 	
 	
 	

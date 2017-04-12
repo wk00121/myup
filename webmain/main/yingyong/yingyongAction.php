@@ -43,13 +43,24 @@ class yingyongClassAction extends Action
 	public function menudataAjax()
 	{
 		$this->rows	= array();
-		$mid		= $this->get('mid');
-		$where 	= "and `mid`='$mid'";
+		$mid		= (int)$this->get('mid');
+		$agentnum	= m('im_group')->getmou('num',$mid);
+		$where 		= "and `mid`='$mid'";
 		$this->getmenu(0, 1, $where);
+		$modeid 	= (int)m('flow_set')->getmou('id',"`num`='$agentnum'");
+		$wherearr	= m('flow_where')->getrows("setid='$modeid' and `num` is not null and `status`=1",'`name`,`num`','sort');
+		$barr[]		= array('num'=>'','name'=>'-选择-');
+		foreach($wherearr as $k=>$rs){
+			$wherearr[$k]['name'] = ''.$rs['num'].'.'.$rs['name'].'';
+			$barr[] = $wherearr[$k];
+		}
 		
 		echo json_encode(array(
 			'totalCount'=> 0,
-			'rows'		=> $this->rows
+			'rows'		=> $this->rows,
+			'agentnum'	=> $agentnum,
+			'modeid'	=> $modeid,
+			'wherearr'	=> $barr,
 		));
 	}
 	

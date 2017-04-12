@@ -103,8 +103,9 @@
 			var dob=this.changetype.indexOf('dept')==-1;
 			for(i=0;i<len;i++){
 				if(a[i].pid==pid){
-					s2 = '<input name="changeuserinput_'+rand+'" xls="d" xname="'+a[i].name+'" value="'+a[i].id+'" style="width:18px;height:18px;" type="'+type+'">';
+					s2 = '<input name="changeuserinput_'+rand+'" xls="d" xname="'+a[i].name+'" xu="'+i+'" value="'+a[i].id+'" style="width:18px;height:18px;" type="'+type+'">';
 					if(dob)s2='';
+					if(s2!='' && !this._isdeptcheck(a[i]))s2='';
 					s+='<div class="listsss">';
 					s+='<table width="100%"><tr><td>'+s1+'</td><td deptxu="'+i+'_'+oi+'" width="100%"><img align="absmiddle" height="20" height="20" src="images/files.png">&nbsp;'+a[i].name+'</td><td>'+s2+'</td></tr></table>';
 					s+='</div>';
@@ -135,6 +136,35 @@
 				me._searchkey(false);
 			},500);
 		};
+		this._isdeptcheck=function(a){
+			if(this.inputtype=='checkbox' && this.changetype.indexOf('user')>=0 && this.changetype.indexOf('dept')>=0){
+				var stotal,i,nstotal=0,len=this.userarr.length,spath;
+				stotal = parseFloat(a.stotal);
+				for(i=0;i<len;i++){
+					spath = this.userarr[i].deptpath;
+					if(spath.indexOf('['+a.id+']')>=0)nstotal++;
+				}
+				return nstotal>=stotal;
+			}else{
+				return true;
+			}
+		},
+		this._clickcheckbox=function(o1){
+			var o = $(o1),xu,a,stotal,i,nstotal=0,len=this.userarr.length,spath;
+			if(o.attr('xls')!='d')return;
+			xu = parseFloat(o.attr('xu'));
+			a  = this.deptarr[xu];
+			stotal = parseFloat(a.stotal);
+			for(i=0;i<len;i++){
+				spath = this.userarr[i].deptpath;
+				if(spath.indexOf('['+a.id+']')>=0)nstotal++;
+			}
+			if(nstotal<stotal){
+				o1.checked=false;
+				o1.disabled=true;
+				js.msg('msg','无权选择部门['+a.name+']');
+			}
+		},
 		this._searchkey = function(bo){
 			var key = $('#changekey_'+this.rand+'').val(),s='',a=[],d=[],len,i;
 			a=this.userarr;
@@ -296,11 +326,17 @@
 		this.queding=function(){
 			var ns= 'changeuserinput_'+rand+'';
 			var o = $("input[name='"+ns+"']");
-			var i,len=o.length,o1,xna,xal,sid='',sna='';
+			var i,len=o.length,o1,xna,xu,xal,sid='',sna='',seld=[];
 			for(i=0;i<len;i++){
 				o1 = $(o[i]);
 				if(o[i].checked){
 					xna= o1.attr('xname');
+					xu = parseFloat(o1.attr('xu'));
+					if(this.checked){
+						seld.push(this.data[xu]);
+					}else{
+						seld=this.data[xu];
+					}
 					xal= o1.val();
 					sid+=','+xal+'';
 					sna+=','+xna+'';
@@ -315,7 +351,7 @@
 				this.nameobj.value=sna;
 				this.nameobj.focus();
 			}
-			this.onselect(sna, sid);
+			this.onselect(seld,sna, sid);
 			this.hide();
 		};
 		this.showdata=function(a,inb){
@@ -328,8 +364,8 @@
 				var type='checkbox';
 				if(!this.checked)type='radio';
 				for(i=0;i<len;i++){
-					s2 = '<input name="changeuserinput_'+rand+'" xname="'+a[i].name+'" value="'+a[i].value+'" style="width:18px;height:18px;" align="absmiddle" type="'+type+'">';
-					s+='<div class="listsss">'+s2+'&nbsp;'+a[i].name+'</div>';
+					s2 = '<input xu="'+i+'" name="changeuserinput_'+rand+'" xname="'+a[i].name+'" value="'+a[i].value+'" style="width:18px;height:18px;" align="absmiddle" type="'+type+'">';
+					s+='<div class="listsss"><label>'+s2+'&nbsp;'+a[i].name+'</label></div>';
 				}
 				s1='共'+len+'条';
 			}

@@ -67,8 +67,21 @@ class flow_meetClassModel extends flowModel
 	
 	protected function flowbillwhere($uid, $lx)
 	{
+		
+		m($this->mtable)->update('state=2',"`state`=0 and `enddt`<'{$this->rock->now}'");	
 		$dt 	= $this->rock->post('dt');
+		$where 	= '';
+		if($dt!='')$where.=" and startdt like '$dt%'";
+		$fields	= 'id,startdt,enddt,optname,state,title,hyname,joinname,`explain`,jyname';
+		return array(
+			'fields' => $fields,
+			'where'	 => $where,
+			'order' => 'startdt desc'
+		);
+
+		/*	
 		$key 	= $this->rock->post('key');
+		$keywhere = '';
 		
 		$where	= 'and 1=2';
 		if($lx=='my' || $lx=='mybz' || $lx=='myall'){
@@ -91,13 +104,14 @@ class flow_meetClassModel extends flowModel
 		m($this->mtable)->update('state=2',"`state`=0 and `enddt`<'{$this->rock->now}'");
 
 		if($dt!='')$where.=" and startdt like '$dt%'";
-		if(!isempt($key))$where.=" and (`joinname` like '%$key%' or `title` like '%$key%')";
+		if(!isempt($key))$keywhere=" and (`joinname` like '%$key%' or `title` like '%$key%')";
 		
 		
 		return array(
 			'where' => "and type=0 and `status`=1 $where",
-			'fields'=> 'id,startdt,enddt,optname,state,title,hyname,joinname,`explain`,jyname',
+			'keywhere' => $keywhere,
+			'fields'=> $fields,
 			'order' => 'startdt desc'
-		);
+		);*/
 	}
 }

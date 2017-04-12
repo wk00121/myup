@@ -148,7 +148,7 @@ var nwjs={
 		return;if(!this.nw)return;
 		if(!funarr)funarr=function(){};
 		try{
-			var dgram = require("dgram");
+			var dgram 	= require("dgram");
 			this.server = dgram.createSocket("udp4");
 			this.server.on("error", function (err) {
 				nwjs.server.close();
@@ -163,5 +163,31 @@ var nwjs={
 		}catch(e){
 			this.server=false;
 		}
+	},
+	downfile:function(params){
+		var cans 	= js.apply({url:'',savefile:'',onsuccess:function(){},onjindu:function(){},onerror:function(){}},params);
+		var http 	= require('http');
+		http.get(cans.url, function(res) { 
+			if(res.statusCode != 200){
+				cans.onerror('not found');
+				return;
+			}
+			var filesize = res.headers['content-length'];
+			if(!filesize)filesize = res.headers['accept-length'];
+			filesize	= parseFloat(filesize);
+			res.setEncoding('binary');
+			var str = '';
+			res.on('data',function(s){
+				str+=s;
+				var jd = Math.round(100*str.length/filesize);
+				cans.onjindu(jd, filesize*jd*0.01);
+			}).on('end', function(){
+				nwjs.fs.writeFile(cans.savefile, str, 'binary', function(err){
+					cans.onsuccess();
+				});
+			});
+		}).on('error', function(e) {
+			cans.onerror('error');
+		});
 	}
 };

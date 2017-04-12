@@ -1,0 +1,2 @@
+task/mode/p,[错误SQL]：《SELECT count(1) FROM up_baobiao WHERE `id`='4'   and ((optid=1))》----------原因：Unknown column 'optid' in 'where clause'
+URL：a=p&num=baobiao&mid=4&callback=

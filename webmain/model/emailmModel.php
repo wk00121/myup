@@ -22,6 +22,7 @@ class emailmClassModel extends Model
 		$time	= $this->optionobj->getval($ukey,'',3);
 		if(!isempt($time))$time = strtotime($time);
 		if(isempt($this->receyumi))return '未设置收信邮箱域名';
+		if(isempt($myurs['email']))return '未设置邮箱，可到[系统→邮件管理→用户邮箱设置]下设置';
 		if(!contain($myurs['email'], $this->receyumi))return '邮箱域名必须是['.$this->receyumi.']';
 		$rows 	= c('imap')->receemail($this->recehost, $myurs['email'], $myurs['emailpass'], $time);
 		if(!is_array($rows))return $rows;
@@ -37,7 +38,7 @@ class emailmClassModel extends Model
 			if($id>0)continue;
 			
 			$uarr['message_id'] = $message_id;
-			$uarr['title'] 		= $rs['subject'];
+			$uarr['title'] 		= $this->db->tocovexec($rs['subject'], 1);
 			$uarr['content'] 	= $this->db->tocovexec($rs['body'], 1);
 			$uarr['senddt'] 	= $rs['date'];
 			$uarr['optdt'] 		= $this->rock->now;

@@ -111,8 +111,10 @@ class deptClassAction extends Action
 	
 	public function deptuserjsonAjax()
 	{
-		$deptarr 	= m('dept')->getdata();
-		$userarr 	= m('admin')->getuser(1);
+		$udarr 		= m('dept')->getdeptuserdata();
+		$userarr 	= $udarr['uarr'];
+		$deptarr 	= $udarr['darr'];
+		
 		$arr['deptjson']	= json_encode($deptarr);
 		$arr['userjson']	= json_encode($userarr);
 		$this->showreturn($arr);

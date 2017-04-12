@@ -226,3 +226,111 @@ js.getuser = function(cans){
 	can.onselect=can.callback;
 	js.changeuser(false, can.type, can.title, can);
 }
+
+/**
+*	高级搜索使用
+*/
+var highdata={};
+function highsearchclass(options){
+	var me 		= this;
+	var cans 	= js.apply({'oncallback':function(){},'modenum':''}, options);
+	for(var a in cans)this[a]=cans[a];
+	this.init 	= function(){
+		if(!this.modenum)return;
+		js.tanbody('searchhigh','高级搜索', 450,300,{
+			html:'<div id="searchhighhtml" style="height:200px;overflow:auto;"></div>',
+			btn:[{text:'搜索'}],
+			msg:'<a id="searchhigh_cz" href="javascript:;">[重置]</a> &nbsp; '
+		});
+		$('#searchhigh_btn0').click(function(){
+			me.queding();
+		});
+		$('#searchhigh_cz').click(function(){
+			me.chongzhi();
+		});
+		this.initfields();
+	};
+	this.initfields=function(){
+		$('#searchhighhtml').html('<div align="center" style="padding:10px">'+js.getmsg('加载中...')+'</div>');
+		var fieldsat = this.getinitdata('fields');
+		if(!fieldsat){
+			var url = js.getajaxurl('getcolumns','mode_'+this.modenum+'|input','flow');
+			js.ajax(url,{modenum:this.modenum},function(ret){
+				me.searchhighshow(ret);
+			},'get,json');
+		}else{
+			this.searchhighshow(fieldsat);
+		}
+	},
+	this.getinitdata=function(lx){
+		var d = highdata[this.modenum];
+		if(!d)return false;
+		return d[lx];
+	};
+	this.setinitdata=function(lx, da){
+		if(!highdata[this.modenum])highdata[this.modenum]={};
+		highdata[this.modenum][lx]=da;
+	};
+	this.searchhighshow=function(d){
+		this.setinitdata('fields',d);
+		var s = '<form name="highform"><table width="100%">',i,len=d.length,b;
+		for(i=0;i<len;i++){
+			b = d[i];
+			s+='<tr>';
+			s+='<td width="80" align="right"><font color="#555555">'+b.name+'</font></td>';
+			s+='<td style="padding:5px">'+this.searchhighshowinput(b)+'</td>';
+			s+='</tr>';
+		}
+		s+='</table></form>';
+		$('#searchhighhtml').html(s);
+		var obj	= document['highform'],i,data=this.getinitdata('data'),na;
+		if(!data)data={};
+		for(i=0;i<obj.length;i++){
+			$(obj[i]).blur(function(){
+				me.saveformdata();
+			}).keyup(function(e){
+				if(e.keyCode==13)me.queding();
+			});
+			na = obj[i].name;
+			if(data[na])obj[i].value=data[na];
+		}
+	};
+	this.chongzhi=function(){
+		document['highform'].reset();
+		this.saveformdata();
+	};
+	this.searchhighshowinput=function(b){
+		var type = b.fieldstype,name = 'soufields_'+b.fields+'';
+		var s = '<input placeholder="关键词包含" type="text" class="inputs" name="'+name+'">';
+		if(type=='date' || type=='datetime' || type=='month'){
+			s='<input style="width:150px" onclick="js.datechange(this,\'date\')" class="inputs datesss" readonly  name="'+name+'_start"> 至 <input onclick="js.datechange(this,\'date\')" style="width:150px" class="inputs datesss" readonly name="'+name+'_end"> ';
+		}
+		if(type=='month'){
+			s='<input style="width:150px" onclick="js.datechange(this,\''+type+'\')" class="inputs datesss" readonly name="'+name+'">';
+		}
+		if(type=='number'){
+			s='<input style="width:150px" type="number" onfocus="js.focusval=this.value" maxlength="10" onblur="js.number(this)" class="inputs" name="'+name+'_start"> 至 <input style="width:150px" type="number" onfocus="js.focusval=this.value" maxlength="10" onblur="js.number(this)" class="inputs" name="'+name+'_end"> ';
+		}
+		if(type=='select' || type=='rockcombo'){
+			var i = 0,len=b.store.length;
+			s='<select name="'+name+'" class="inputs">';
+			s+='<option value="">-选择-</option>';
+			for(i=0;i<len;i++){
+				s+='<option value="'+b.store[i].value+'">'+b.store[i].name+'</option>';
+			}
+			s+='</select>';
+		}
+		return s;
+	};
+	this.queding=function(){
+		var d = this.saveformdata();
+		this.oncallback(d);
+		js.tanclose('searchhigh');
+	};
+	this.saveformdata=function(){
+		var d = js.getformdata('highform');
+		this.setinitdata('data',d);
+		return d;
+	};
+	this.init();
+}

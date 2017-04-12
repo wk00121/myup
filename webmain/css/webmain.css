@@ -65,7 +65,7 @@ input.checkbox,input.radio{ border:none;padding:0;margin-right:5px; width:14px; 
 
 .input,.select,.textarea{height:30px; line-height:30px; border:1px #cccccc solid; padding:2px 5px;font-size:14px;}
 .textarea{ line-height:26px;}
-.input:focus,input:focus{box-shadow:0px 0px 5px rgba(0,0,0,0.3); border:1px #0887CC solid; color:#000000}
+.input:focus,input:focus,.textarea:focus{box-shadow:0px 0px 5px rgba(0,0,0,0.3); border:1px #0887CC solid; color:#000000}
 
 .box{box-shadow:0px 0px 5px rgba(0,0,0,0.3); border:1px #157FCC solid;}
 

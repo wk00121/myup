@@ -210,6 +210,7 @@ class upgradeClassAction extends Action
 		$data 	= $barr['data'];
 		if($lx==0)$this->tonbbumenu($data['menu']);
 		if($lx==1)$this->tonbbumode($data['mode']);
+		if($lx==4)$this->tonbbumodewq($data['mode']);//完全和官网一样
 		if($lx==2)$this->tonbbuying($data['yydata']);
 		if($lx==3)$this->tonbbutask($data['task']);
 		
@@ -238,9 +239,11 @@ class upgradeClassAction extends Action
 		$db2 	= m('flow_menu');
 		$db3 	= m('flow_extent');
 		$db5 	= m('flow_course');
+		$db6 	= m('flow_where');
 		foreach($data as $num=>$arr){
 			$modeid 	= (int)$db->getmou('id', "`num`='$num'");
 			$flow_set 	= $arr['flow_set'];
+			if(isset($flow_set['id']))unset($flow_set['id']);
 			$isadd		= false;
 			if($modeid==0){
 				$modeid = $db->insert($flow_set);
@@ -259,6 +262,7 @@ class upgradeClassAction extends Action
 			$flow_element= $arr['flow_element'];
 			foreach($flow_element as $k1=>$rs1){
 				$rs1['mid'] = $modeid;
+				if(isset($rs1['id']))unset($rs1['id']);
 				$where 		= "`mid`='$modeid' and `fields`='".$rs1['fields']."' and `iszb`='".$rs1['iszb']."'";
 				if($db1->rows($where)==0){
 					$db1->insert($rs1);
@@ -301,11 +305,71 @@ class upgradeClassAction extends Action
 				if($db5->rows('setid='.$modeid.'')==0){
 					$flow_course = $arr['flow_course'];
 					foreach($flow_course as $k5=>$rs5){
+						if(isset($rs5['id']))unset($rs5['id']);
 						$rs5['setid'] = $modeid;
 						$db5->insert($rs5);
 					}
 				}
 			}
+			
+			//流程模块条件
+			$flow_where = $arr['flow_where'];
+			foreach($flow_where as $k6=>$rs6){
+				$rs6['setid'] = $modeid;
+				if(isset($rs6['id']))unset($rs6['id']);
+				$num 			= $rs6['num'];
+				if(isempt($num))continue;
+				$where 			= "`setid`='$modeid' and `num`='$num'";
+				if($db6->rows($where)==0){
+					$db6->insert($rs6);
+				}else{
+					$db6->update($rs6, $where);
+				}
+			}
+		}
+	}
+	
+	//跟官网完全一样同步模块
+	private function tonbbumodewq($data)
+	{
+		$db 	= m('flow_set');
+		$this->initstalltable('flow_set');
+		$this->initstalltable('flow_element');
+		$this->initstalltable('flow_menu');
+		$this->initstalltable('flow_extent');
+		$this->initstalltable('flow_course');
+		$this->initstalltable('flow_where');
+		
+		foreach($data as $num=>$arr){
+			$flow_set 		= $arr['flow_set'];
+			$flow_element 	= $arr['flow_element'];
+			$flow_menu 		= $arr['flow_menu'];
+			$flow_extent 	= $arr['flow_extent'];
+			$flow_course 	= $arr['flow_course'];
+			$flow_where 	= $arr['flow_where'];
+			
+			
+			$db->insert($flow_set);
+			
+			$this->insertdata($flow_element, 'flow_element');
+			$this->insertdata($flow_menu, 'flow_menu');
+			$this->insertdata($flow_extent, 'flow_extent');
+			$this->insertdata($flow_course, 'flow_course');
+			$this->insertdata($flow_where, 'flow_where');
+		}
+	}
+	private function initstalltable($table)
+	{
+		$sql1 = "delete from `[Q]".$table."`";
+		$sql2 = "alter table `[Q]".$table."` AUTO_INCREMENT=1";
+		$this->db->query($sql1, false);
+		$this->db->query($sql2, false);
+	}
+	private function insertdata($data, $table)
+	{
+		$db 	= m($table);
+		if($data)foreach($data as $k=>$rs){
+			$db->insert($rs);
 		}
 	}
 	

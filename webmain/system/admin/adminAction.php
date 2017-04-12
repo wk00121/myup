@@ -34,25 +34,7 @@ class adminClassAction extends Action
 		);
 	}
 	
-	public function tongxlbeforeshow($table)
-	{
-		$fields = '`id`,`name`,`deptallname`,`ranking`,`tel`,`mobile`,`email`,`type`,`sort`,`face`';
-		$s 		= 'and `status`=1';
-		$key 	= $this->post('key');
-		$zt 	= $this->post('zt');
-		//我直属下属
-		if($zt == '0'){
-			$s.= ' and '.m('admin')->getdowns($this->adminid,1);
-		}
-		if($key!=''){
-			$s .= m('admin')->getkeywhere($key);
-		}
-		return array(
-			'fields'=> $fields,
-			'where'	=> $s,
-			'order'	=> 'sort'
-		);
-	}
+
 	public function fieldsafters($table, $fid, $val, $id)
 	{
 		$fields = 'sex,ranking,tel,mobile,workdate,email,quitdt';

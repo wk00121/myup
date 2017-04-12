@@ -162,7 +162,9 @@ $(document).ready(function(){
 <div class="blank10"></div>
 <div>1、同步菜单，系统上操作菜单会和官网同步，也可到【系统→菜单管理】下管理。<a onclick="upfetwontbu(0,this)" href="javascript:;">[同步]</a></div>
 <div class="blank10"></div>
-<div>2、同步流程模块，流程模块会和官网同步，也可到【流程模块】下管理。<a onclick="upfetwontbu(1,this)" href="javascript:;">[同步]</a></div>
+<div>2、同步流程模块，流程模块会和官网同步，也可到【流程模块】下管理。<a onclick="upfetwontbu(1,this)" href="javascript:;">[1.同步]</a>，<a onclick="upfetwontbu(4,this)" href="javascript:;">[2.同步完全和官网一致]</a></div>
+<div style="color:#888888"><font color=white>2、</font>[1.同步]：同步了不会覆盖自己的配置信息，[2.同步完全和官网一致]：会完成和官网一致，同时会删除自己配置和新建的模块，谨慎。</div>
+<!--<div><font color=white>2、</font>输入要同步的模块编号：<input style="width:250px" placeholder="模块编号多个,分开，输入all为全部" class="inputs"></div>-->
 <div class="blank10"></div>
 <div>3、同步桌面版/手机上应用，应用会和官网同步，也可到【系统→即时通信管理→应用管理】下管理。<a onclick="upfetwontbu(2,this)" href="javascript:;">[同步]</a></div>
 <div class="blank10"></div>

@@ -228,7 +228,7 @@ class Action extends mainAction
 					$rs['statustext'] 	= $this->flow->getstatus($rs,'','',1);
 					if($rs['status']==5)$rs['ishui'] 		= 1;
 				}
-				$rows[$k] 				= $this->flow->flowrsreplace($rs);
+				$rows[$k] 				= $this->flow->flowrsreplace($rs,2);
 			}
 			$bacarr['rows'] = $rows;
 		}

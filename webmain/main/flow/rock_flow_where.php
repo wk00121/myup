@@ -29,21 +29,35 @@ $(document).ready(function(){
 	}
 	
 	var a = $('#view_{rand}').bootstable({
-		tablename:'flow_where',celleditor:true,defaultorder:'setid,id desc',
+		tablename:'flow_where',celleditor:true,defaultorder:'setid,sort,id desc',
 		columns:[{
-			text:'名称',dataIndex:'name',
+			text:'名称',dataIndex:'name',editor:true
 		},{
-			text:'编号',dataIndex:'num'
+			text:'编号',dataIndex:'num',editor:true
 		},{
 			text:'人员',dataIndex:'recename'
 		},{
 			text:'人员除外',dataIndex:'nrecename'
 		},{
-			text:'说明',dataIndex:'explain'
+			text:'说明',dataIndex:'explain',editor:true
 		},{
 			text:'排序号',dataIndex:'sort',editor:true
 		},{
-			text:'ID',dataIndex:'id'
+			text:'列表页显示',dataIndex:'islb',type:'checkbox',editor:true,sortable:true
+		},{
+			text:'状态',dataIndex:'status',type:'checkbox',editor:true,sortable:true
+		},{
+			text:'ID',dataIndex:'id',sortable:true
+		},{
+			text:'模块id',dataIndex:'setid',sortable:true
+		},{
+			text:'',dataIndex:'opt',renderer:function(v,d,oi){
+				var s='&nbsp;';
+				if(!isempt(d.num)){
+					s='<a href="javascript:;" onclick="chakan{rand}('+oi+')">查看</a>';
+				}
+				return s;
+			}
 		}],
 		itemclick:function(d){
 			mid=d.setid;
@@ -68,11 +82,21 @@ $(document).ready(function(){
 				name='编辑条件';
 			};
 			guanflowwherelist = a;
-			addtabs({num:'flowwhere'+id+'',url:'main,flow,whereedit,id='+id+',setid='+mid+',',icons:icon,name:name});
+			addtabs({num:'flowwhere'+id+'',url:'main,flow,whereedit,id='+id+',setid='+mid+'',icons:icon,name:name});
 		}
 	};
 	js.initbtn(c);
 	$('#optionview_{rand}').css('height',''+(viewheight-62)+'px');
+	
+	chakan{rand}=function(oi){
+		var num = at.changedata.num;
+		if(!at.changedata || !num){
+			js.msg('msg','请先双击左边模块');
+			return;
+		}
+		var d = a.getData(oi);
+		addtabs({num:'flowviewset'+d.id+'',url:'flow,page,'+num+',atype='+d.num+'',name:d.name});
+	}
 });
 </script>
 
@@ -103,6 +127,7 @@ $(document).ready(function(){
 	</div>
 	<div class="blank10"></div>
 	<div id="view_{rand}"></div>
+	<div class="tishi">列表页显示：会在生成列表页面上显示的，需要设置编号</div>
 </td>
 </tr>
 </table>

@@ -459,9 +459,8 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 	
 	public function viewshowafter($table, $rows)
 	{
-		$arr = array();
-		$ztarr  = explode(',','待处理,已审核,处理不通过');
-		$ztarrc = explode(',','blue,green,red');
+		$arr 	= array();
+		$flow 	= m('flow')->initflow($this->moders['num']);
 		foreach($rows as $k=>$rs){
 			$zt 	= '';
 			if(isset($rs['status']))$zt = $rs['status'];
@@ -471,10 +470,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			$narr['modename'] 	= $this->moders['name'];
 			$narr['optdt'] 		= $rs['optdt'];
 			$narr['summary'] 	= $this->rock->reparr($this->moders['summary'], $rs);
-			if($this->isflow == 1){
-				$zt = '<font color="'.$ztarrc[$zt].'">'.$ztarr[$zt].'</font>';
-			}
-			$narr['status']		= $zt;
+			$narr['status']		= $flow->getstatus($rs,'','',1);
 			$arr[] = $narr;
 		}
 		return array('rows'=>$arr);
@@ -525,7 +521,7 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			$tablessa = explode(',', $mrs['tables']);
 			if(isset($tablessa[$iszb-1]))$tables = $tablessa[$iszb-1];
 		}
-		if(!isempt($tables) && substr($fields,0,5)!='temp_'){
+		if(!isempt($tables) && substr($fields,0,5)!='temp_' && $cans['islu']==1){
 			$allfields = $this->db->getallfields('[Q]'.$tables.'');
 			if(!in_array($fields, $allfields)){
 				$str = "ALTER TABLE `[Q]".$tables."` ADD `$fields` ";
@@ -670,4 +666,40 @@ class mode_'.$modenum.'ClassAction extends inputAction{
 			'maxpid' => $maxpid+1,
 		);
 	}
+	
+	
+	
+	
+
+	
+	
+	//生成列表页面
+	public function changeliebAjax()
+	{
+		$modeid = (int)$this->post('modeid');
+		$path 	= m('mode')->createlistpage($modeid);
+		if($path=='')$path	= '无法生成，可能没权限写入'.P.'/flow/page目录';
+		echo $path;
+	}
+	
+	//生成所有
+	public function allcreateAjax()
+	{
+		$dbs  = m('mode');
+		$rows = $dbs->getall("`status`=1 and `type`<>'系统'");
+		$oi   = 0;
+		$msg  = '';
+		foreach($rows as $k=>$rs){
+			$path 	= $dbs->createlistpage($rs);
+			if($path==''){
+				if($path=='')$msg	= '无法生成，可能没权限写入'.P.'/flow/page目录';
+				break;
+			}else{
+				$oi++;
+			}
+		}
+		if($msg=='')$msg='已生成'.$oi.'个模块，可到'.P.'/flow/page下查看';
+		echo $msg;
+	}
+	
 }

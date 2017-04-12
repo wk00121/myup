@@ -6,7 +6,7 @@ $(document).ready(function(){
 	if(!id)id = 0;
 	var h = $.bootsform({
 		window:false,rand:'{rand}',tablename:'flow_where',url:publicsave('{mode}','{dir}'),
-		submitfields:'setid,name,wheresstr,whereustr,wheredstr,explain,recename,receid,nrecename,nreceid,num,sort',requiredfields:'name',
+		submitfields:'setid,name,wheresstr,whereustr,wheredstr,explain,recename,status,islb,receid,nrecename,nreceid,num,sort',requiredfields:'name',
 		success:function(){
 			closenowtabs();
 			try{guanflowwherelist.reload();}catch(e){}
@@ -19,6 +19,7 @@ $(document).ready(function(){
 			}
 		},
 		submitcheck:function(d){
+			if(d.islb==1&&d.num=='')return '请设置一个编号';
 			return {
 				wheresstr:jm.base64encode(d.wheresstr),
 				whereustr:jm.base64encode(d.whereustr),
@@ -85,7 +86,7 @@ $(document).ready(function(){
 			<td  align="right"  width="20%"><font color=red>*</font> 名称：</td>
 			<td class="tdinput"  width="35%"><input name="name" class="form-control"></td>
 			<td  align="right"   width="15%">编号：</td>
-			<td class="tdinput" width="30%"><input name="num" maxlength="30" class="form-control"></td>
+			<td class="tdinput" width="30%"><input name="num"  maxlength="30" class="form-control"></td>
 		</tr>
 		
 		
@@ -138,6 +139,14 @@ $(document).ready(function(){
 			<td class="tdinput"><input name="sort" value="0" maxlength="3" type="number"  onfocus="js.focusval=this.value" onblur="js.number(this)" class="form-control"></td>
 	
 			
+		</tr>
+		
+		<tr>
+			<td  align="right" ></td>
+			<td class="tdinput" colspan="3">
+				<label><input name="status" value="1" checked type="checkbox"> 启用?</label>&nbsp; &nbsp; 
+				<label><input name="islb" value="0" type="checkbox"> 列表页显示</label>&nbsp; &nbsp; 
+			</td>
 		</tr>
 
 		

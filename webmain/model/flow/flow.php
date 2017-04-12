@@ -18,6 +18,7 @@ class flowModel extends Model
 	public $urs			= array();	//当前单据对应用户
 	public $drs			= array();	//当前单据对应用户
 	public $fieldsarr	= array();	//主表元素字段数组
+	public $fieldsarra	= array();  //元素数组
 	public $mwhere;				
 	public $mtable;				//当前模块对应表
 	public $uname;				//当前单据对应用户姓名
@@ -111,10 +112,20 @@ class flowModel extends Model
 		$this->flogmodel= m('flow_log');
 		$this->checksmodel	= m('flow_checks');
 		$this->wheremodel	= m('where');
-		$this->fieldsarr	= m('flow_element')->getrows("`mid`='$this->modeid' and `islu`=1 and `iszb`=0",'`name`,`fields`,`isbt`,`fieldstype`,`savewhere`,`data`,`iszb`','`sort`');
+		$this->tfieldsarra();
 		$this->flowinit();
 		if($id==null)return;
 		$this->loaddata($id, true);
+	}
+	
+	private function tfieldsarra()
+	{
+		$rows	= m('flow_element')->getrows("`mid`='$this->modeid' and `iszb`=0",'`name`,`fields`,`isbt`,`fieldstype`,`savewhere`,`data`,`iszb`,`issou`,`islu`','`sort`');
+		$this->fieldsarr = array();
+		if($rows)foreach($rows as $k=>$rs){
+			if($rs['islu']==1)$this->fieldsarr[] = $rs;
+		}
+		$this->fieldsarra	= $rows;
 	}
 	
 	public function loaddata($id, $ispd=true)
@@ -986,6 +997,10 @@ class flowModel extends Model
 		if($type=='opt'){
 			$cuid = $this->rs['optid'];
 			$name = $this->rs['optname'];
+			if(isempt($cuid)){
+				$cuid = $this->urs['id'];
+				$name = $this->urs['name'];
+			}
 		}
 		if($type=='user'){
 			$cuid = $crs['checktypeid'];
@@ -1058,6 +1073,8 @@ class flowModel extends Model
 		foreach($oarr as $k=>$v)$arr[$k]=$v;
 		if($biid==0){
 			$arr['uid'] 	= $this->uid;
+			$arr['uname'] 	= $this->rs['base_name'];
+			$arr['udeptname']= $this->rs['base_deptname'];
 			$arr['status'] 	= $arr['nstatus'];
 			$arr['createdt']= $arr['optdt'];
 			$arr['sericnum']= $this->createnum();
@@ -1218,7 +1235,7 @@ class flowModel extends Model
 			$this->rs['zb_nameid'] 	= $zynameid;
 		}
 		$ufied 	= array();
-		if($iszhuanyi == 0 && $zt==1){
+		if($iszhuanyi == 0 && $zt!=2){
 			foreach($flowinfor['checkfields'] as $chef=>$chefv){
 				$ufied[$chef] = $this->rock->post('cfields_'.$chef.'');
 				if(isempt($ufied[$chef]))$this->echomsg(''.$chefv['name'].'不能为空');
@@ -1597,6 +1614,8 @@ class flowModel extends Model
 		$arr['table'] 	= $this->mtable;
 		$arr['fields'] 	= '';
 		$arr['order'] 	= '';
+		$arr['keywhere']= '';
+		$arr['asqom'] 	= ''; //主表别名
 		$nas 			= $this->flowbillwhere($uid, $lx);
 		$inwhere		= '';
 		if(substr($lx,0,5)=='grant'){
@@ -1605,14 +1624,96 @@ class flowModel extends Model
 		$_wehs			= '';
 		if(is_array($nas)){
 			if(isset($nas['where']))$_wehs = $nas['where'];
+			if(isset($nas['asqom']))$arr['asqom']  = $nas['asqom'];
 			if(isset($nas['order']))$arr['order']  = $nas['order'];
 			if(isset($nas['fields']))$arr['fields']= $nas['fields'];
 			if(isset($nas['table']))$arr['table']  = $nas['table'];
+			if(isset($nas['keywhere']))$arr['keywhere']  = $nas['keywhere'];
 		}else{
 			$_wehs	= $nas;
 		}
-		$arr['where'] 	= $inwhere.' '.$_wehs;
+		$fwhere			= $this->getflowwhere($uid, $lx);//流程模块上条件
+		
+		
+		
+		$where 			= $inwhere;
+		$wherestr 		= $this->moders['where'];
+		if(!isempt($wherestr)){
+			$wherestr = $this->rock->covexec($wherestr);
+			$where .= ' and '.$wherestr;
+		}
+		
+		if($fwhere!='')$where .= ' '.$fwhere; 
+		if($_wehs!='')$where .= ' '.$_wehs;
+		$highwhere		= $this->gethighwhere();//高级搜索
+		
+		//关键词搜索
+		$key 			= $this->rock->post('key');
+		if(!isempt($key) && isempt($arr['keywhere'])){
+			$_kearr = array();
+			$skeay 	= array('text','textarea','htmlediter','changeuser','changeusercheck','changedept','changedeptusercheck');
+			foreach($this->fieldsarra as $k=>$rs){
+				if($rs['issou']==1 && in_array($rs['fieldstype'], $skeay)){
+					$_kearr[] = "{asqom}`".$rs['fields']."` like '%".$key."%'";
+				}
+			}
+			if($_kearr)$arr['keywhere'] = "and (".join($_kearr, ' or ').")";
+		}
+		if(!isempt($arr['keywhere']))$where .= ' '.$arr['keywhere'];
+
+		if($highwhere!='')$where .= ' '.$highwhere;
+		$where 			= str_replace('{asqom}', $arr['asqom'], $where);
+		$arr['where'] 	= $where;
 		return $arr;
+	}
+	
+	/**
+	*	获取高级搜索条件
+	*/
+	public function gethighwhere()
+	{
+		$s = '';
+		foreach($this->fieldsarra as $k=>$rs){
+			if($rs['issou']!=1)continue;
+			$type 	= $rs['fieldstype'];
+			$fields = $rs['fields'];
+			$val  	= $this->rock->post('soufields_'.$fields.'');
+			if($type=='date' || $type=='datetime' || $type=='number'){
+				$val1  	= $this->rock->post('soufields_'.$fields.'_start');
+				$val2  	= $this->rock->post('soufields_'.$fields.'_end');
+				if($type!='number'){
+					if(!isempt($val1))$val1 = "'$val1'";
+					if(!isempt($val2)){
+						if($type=='datetime')$val2 = "$val2 23:59:59";
+						$val2 = "'$val2'";
+					}
+				}
+				if(!isempt($val1))$s.=" and {asqom}`$fields`>=".$val1."";
+				if(!isempt($val2))$s.=" and {asqom}`$fields`<=".$val2."";
+			}else{
+				if(isempt($val))continue;
+				if($type=='select' || $type=='radio' || $type=='rockcombo'){
+					$s.=" and {asqom}`$fields`='$val'";
+				}else if($type=='month'){
+					$s.=" and {asqom}`$fields` like '$val%'";
+				}else{
+					$s.=" and {asqom}`$fields` like '%$val%'";
+				}
+			}
+		}
+		return $s;
+	}
+	
+	/**
+	*	根据编号获取对应条件flow_where
+	*/
+	public function getflowwhere($uid, $num)
+	{
+		$where = '';
+		$rs 	= $this->wheremodel->getone("`setid`='$this->modeid' and `num`='$num'");
+		if(!$rs)return $where;
+		$where = $this->wheremodel->getwherestr($rs, $uid, $this->flowviewufieds);
+		return $where;
 	}
 	
 	public function getflowrows($uid, $lx, $limit=5)
@@ -1746,6 +1847,7 @@ class flowModel extends Model
 				}
 			}
 			if(isempt($receid))continue;
+			if(substr($receid,0,1)==',')$receid = substr($receid, 1);
 			$cont = $rs['summary'];
 			if(isempt($cont))$cont = $conts;
 			if(isempt($cont)){

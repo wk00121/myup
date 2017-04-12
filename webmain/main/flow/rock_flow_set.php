@@ -66,6 +66,11 @@ $(document).ready(function(){
 				a.reload();
 			},'post',false,'删除中...,删除成功');
 		},
+		allcreate:function(){
+			js.ajax(js.getajaxurl('allcreate','{mode}','{dir}'),{},function(s){
+				js.msg('success', s);
+			},'get',false,'生成中...');
+		},
 		reload:function(){
 			a.reload();
 		},
@@ -146,8 +151,9 @@ $(document).ready(function(){
 		<button class="btn btn-warning" click="clickwin,0" type="button"><i class="icon-plus"></i> 新增</button>&nbsp; 
 		<button class="btn btn-primary" disabled id="downbtn_{rand}" type="button">模块开发管理 <i class="icon-angle-down"></i></button>&nbsp; 
 		<button class="btn btn-default" click="pipei" type="button">重新匹配流程</button>&nbsp; 
-		<button class="btn btn-default" id="biaoge_{rand}" disabled click="biaoge,1" type="button"><i class="icon-table"></i> 对应主表管理</button>
-		<button class="btn btn-default" id="biaoges_{rand}" disabled click="biaoges,1" type="button"><i class="icon-table"></i> 对应子表管理</button>
+		<button class="btn btn-default" id="biaoge_{rand}" disabled click="biaoge,1" type="button"><i class="icon-table"></i> 对应主表管理</button>&nbsp; 
+		<button class="btn btn-default" id="biaoges_{rand}" disabled click="biaoges,1" type="button"><i class="icon-table"></i> 对应子表管理</button>&nbsp; 
+		<button class="btn btn-default" click="allcreate" type="button">一键生成所有模块列表页面</button>
 	</td>
 	<td align="left"  style="padding:0px 10px;">
 		
@@ -166,4 +172,4 @@ $(document).ready(function(){
 </div>
 <div class="blank10"></div>
 <div id="view_{rand}"></div>
-<div class="tishi">提示：对应表请使用数据库管理工具管理，如phpMyadmin,Navicat等<div>
+<div class="tishi">提示：对应表请使用数据库管理工具管理，如phpMyadmin,Navicat等，模块列表页面会生成到webmian/flow/page下<div>

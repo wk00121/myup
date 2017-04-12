@@ -447,7 +447,7 @@ js.apply=function(a,b){
 js.tanbodyindex = 90;
 js.tanbody=function(act,title,w,h,can1){
 	this.tanbodyindex++;
-	var can	= js.applyIf(can1,{html:'',showfun:function(){},bodystyle:'',guanact:'',titlecls:'',btn:[]});
+	var can	= js.applyIf(can1,{html:'',msg:'',showfun:function(){},bodystyle:'',guanact:'',titlecls:'',btn:[]});
 	var l=(winWb()-w-50)*0.5,t=(winHb()-h-50)*0.5;
 	var s	= '';
 	var mid	= ''+act+'_main';
@@ -464,7 +464,7 @@ js.tanbody=function(act,title,w,h,can1){
 	s+='	<div id="'+act+'_body" style="'+can.bodystyle+'">';
 	s+=can.html;
 	s+='	</div>';
-	s+='	<div id="'+act+'_bbar" style="padding:5px 10px;background:#eeeeee;line-height:30px;" align="right"><span id="msgview_'+act+'"></span>&nbsp;';
+	s+='	<div id="'+act+'_bbar" style="padding:5px 10px;background:#eeeeee;line-height:30px;" align="right"><span id="msgview_'+act+'">'+can.msg+'</span>&nbsp;';
 	for(var i=0; i<can.btn.length; i++){
 		var a	= can.btn[i];
 		s+='<a class="btn btn-success" id="'+act+'_btn'+i+'" onclick="return false">';
@@ -712,6 +712,7 @@ js.ajax = function(url,da,fun,type,efun, tsar){
 				fun(str);
 			}catch(e){
 				js.msg('msg', str);
+				js.debug(e);
 			}
 		},error:function(e){
 			js.ajaxbool=false;

@@ -78,6 +78,13 @@ class taskClassModel extends Model
 				$rs['runtime'] 	= strtotime($time);
 				$runa[] = $rs;
 			}
+			//每年
+			if($type=='y'){
+				$time 			= date('Y-'.$atime.'');
+				$rs['runtimes'] = $time;
+				$rs['runtime'] 	= strtotime($time);
+				$runa[] = $rs;
+			}
 		}
 		$brun	= array();
 		foreach($runa as $k=>$rs){
@@ -193,6 +200,47 @@ class taskClassModel extends Model
 			'url' => $url
 		));
 		return $barr;
+	}
+	
+	//创建json数组
+	public function createjson()
+	{
+		$barr 	= $this->getrunlist($this->rock->date);
+		$this->rock->createtxt(''.UPDIR.'/'.date('Y-m').'/tasklist.json', json_encode($barr));
+		return $barr;
+	}
+	
+	/**
+	*	cli 运行没分钟运行的，运行curl的
+	*/
+	public function runjsonlist()
+	{
+		$barr	= array();
+		$fstr	= @file_get_contents(''.UPDIR.'/'.date('Y-m').'/tasklist.json');
+		$time 	= time();
+		$time1 	= strtotime(date('Y-m-d'));
+		if($time-$time1<180)$fstr = '';//每天自动重启生成json
+		if(isempt($fstr)){
+			$barr = $this->createjson();
+			m('option')->setval('systaskrun', $this->rock->now);//记录运行时间
+		}else{
+			$barr = json_decode($fstr, true);
+		}
+		$oi 	= $cg = $sb = 0;
+		$ntime 	= strtotime(date('Y-m-d H:i:00'));
+		$curl 	= c('curl');
+		foreach($barr as $k=>$rs){
+			if($rs['runtime']==$ntime){
+				$oi++;
+				$cont = $curl->getcurl($rs['url']);
+				if($cont=='success'){
+					$cg++;
+				}else{
+					$sb++;
+				}
+			}
+		}
+		return 'runtask('.$oi.'),success('.$cg.'),fail('.$sb.')';
 	}
 	
 	//获取运行列表

@@ -111,7 +111,7 @@ $(document).ready(function(){
 		
 		<tr>
 			<td  align="right">是否记录访问sql日志：</td>
-			<td class="tdinput"><select id="sqllog_{rand}"  class="form-control"><option value="0">否</option><option value="1">是</option></select><font color="#888888">开启了日志将记录在目录upload/sqllog下</font></td>
+			<td class="tdinput"><select id="sqllog_{rand}"  class="form-control"><option value="0">否</option><option value="1">是</option></select><font color="#888888">开启了日志将记录在目录<?=UPDIR?>/sqllog下</font></td>
 		</tr>
 		
 		

@@ -5,7 +5,7 @@
 <meta name="viewport" content="maximum-scale=1.0,minimum-scale=1.0,user-scalable=0,width=device-width,initial-scale=1.0"/>
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="yes" />
-<title>银联</title>
+<title>信呼</title>
 <link rel="stylesheet" type="text/css" href="res/css/webimcss.css"/>
 <link rel="shortcut icon" href="favicon.ico" />
 <script type="text/javascript" src="res/js/jquery.js"></script>
@@ -19,7 +19,7 @@
 <script>
 var temp_token='';
 function initbody(){
-	systemtitle = js.getoption('systemtitle','银联');
+	systemtitle = js.getoption('systemtitle','信呼');
 	resize();
 	$(window).resize(resize);
 	js.splittime=0;
@@ -40,7 +40,9 @@ function initbody(){
 		loginsubmit(0);
 	}
 	if(nwjs.nw){
-		$('#footerts').append(', <a onclick="return clearchater()" href="javascript:;">[清空缓存]</a>, <a onclick="return updatejian()" href="javascript:;">[检查更新]</a>');
+		$('#footerts').append(', <a onclick="return clearchater()" href="javascript:;">[清空缓存]</a>, <a onclick="return updatejian(false)" href="javascript:;">[检查更新]</a>');
+		var jtd= js.getoption('lastjcupdate');
+		if(jtd!=js.now())updatejian(true);//每天检查更新
 	}
 }
 function clearchater(){
@@ -54,20 +56,21 @@ function clearchater(){
 		}
 	});
 }
-function updatejian(){
+function updatejian(upb){
 	var ver = '';
 	try{ver = nwjs.fs.readFileSync('version.txt');}catch(e){}
-	js.msg('wait','检查中...');
+	if(!upb)js.msg('wait','检查中...');
 	$.getJSON('http://xh829.com/api.php?a=clientupg&callback=?&version='+ver+'',function(a){
 		var d = a.data;
+		js.msg();
 		if(d.upbool){
-			js.msg();
 			js.confirm('有最新版本V'+d.version+'：'+d.desc+'。是否去直接下载？', function(jg){
 				if(jg=='yes')js.open(d.upgurl);
 			});
 		}else{
-			js.msg('success','当前已是最新版本了');
+			if(!upb)js.msg('success','当前已是最新版本了');
 		}
+		js.setoption('lastjcupdate',js.now());
 	});
 }
 function bodyunload(){
@@ -119,12 +122,6 @@ function loginsuccess(a){
 	js.setoption('systemlogo',a.weblogo);
 	get('myface').src = a.face;
 	js.location('webos.html');
-	return;
-	if(nwjsgui){
-		js.location('mainnw.html?rnd='+js.getrand()+'');
-	}else{
-		js.location('main.html?rnd='+js.getrand()+'');
-	}
 }
 function loginset(){
 	js.prompt('设置', '您系统地址', function(lx,url){

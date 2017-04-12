@@ -200,6 +200,15 @@ function closenowtabs(){
 	closetabs(nu);
 }
 
+function nowtabssettext(srt,icos){
+	var num=nowtabs.num;
+	var txt = srt;
+	tabsarr[num].name = srt;
+	nowtabs.name = srt;
+	if(icos)txt='<i class="icon-'+icos+'"></i>  '+txt+'';
+	$('#tabs_'+num+' font').html(txt);
+}
+
 function changetabs(num,lx){
 	if(coloebool)return;
 	if(!lx)lx=0;
@@ -210,6 +219,7 @@ function changetabs(num,lx){
 		$('#content_'+num+'').show();
 		$('#tabs_'+num+'').addClass('accive');
 		nowtabs = tabsarr[num];
+		if(typeof(nowtabs.onshow)=='function')nowtabs.onshow();
 		bo = true;
 	}
 	opentabs.push(num);
@@ -239,6 +249,9 @@ function addiframe(a){
 	addtabs(a);
 }
 
+/**
+*	添加选择卡
+*/
 function addtabs(a){
 	var url = a.url,
 		num	= a.num;
@@ -249,9 +262,9 @@ function addtabs(a){
 	nowtabs = a;
 	if(changetabs(num))return true;
 
-	var s = '<td temp="tabs" nowrap onclick="changetabs(\''+num+'\',1)" id="tabs_'+num+'" class="accive">';
+	var s = '<td temp="tabs" nowrap onclick="changetabs(\''+num+'\',1)" id="tabs_'+num+'" class="accive"><font>';
 	if(a.icons)s+='<i class="icon-'+a.icons+'"></i>  ';
-	s+=a.name;
+	s+=a.name+'</font>';
 	if(!a.hideclose)s+='<span onclick="closetabs(\''+num+'\')" class="icon-remove"></span>';
 	s+='</td>';
 	objtabs.append(s);

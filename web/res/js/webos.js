@@ -156,9 +156,18 @@ function sendtype(receid,type){
 function linkbooschange(){
 	if(otherlogin)return;
 	if(!connectbool){
-		js.msg('msg','无法连接服务器2<br><span id="lianmiao"></span><a href="javascript:;" onclick="return connectserver()">[重连]</a>',-1);
+		js.msg('msg','无法连接服务器2<br><span id="lianmiao"></span><a href="javascript:;" onclick="return connectserver()">[重连]</a>&nbsp;<a href="http://xh829.com/view_server.html" target="_blank">[帮助]</a>',-1);
 		relianshotime(30);
 	}
+}
+
+js.downshow=function(id){
+	if(nwjs.nw){
+		im.downfile(id);
+	}else{
+		js.open(''+apiurl+'?a=down&id='+id+'',600,350);
+	}
+	return false;
 }
 function relianshotime(oi){
 	clearTimeout(relianshotime_time);
@@ -220,6 +229,47 @@ var im={
 		viewheight = 400;
 		this.shownow();
 		$(window).resize(im.resize);
+	},
+	downfile:function(fid){
+		if(!nwjs.nw)return;
+		js.msg('wait','初始化文件...');
+		js.ajax('file','getfile',{id:fid}, function(ret){
+			var fpath = ret.filepath,fid=ret.id;
+			var durl  = js.apiurl('file','down',{id:ret.id});
+			if(fpath.indexOf('.uptemp')<0)durl = ''+apiurl+''+fpath+'';
+			var savefile= ''+im.getsavepath()+'\\'+ret.filename+'';
+			var num = 'downfile'+adminid+'_'+fid+'';
+			var zte = ''+QOM+''+num+'_zt';
+			js.setoption(num,'{"savefile":"'+savefile.replace(/\\/gi, '|')+'","id":"'+fid+'","filename":"'+ret.filename+'","filesizecn":"'+ret.filesizecn+'"}');
+			if(nwjs.fs.existsSync(savefile)){
+				js.msg('success','文件已下载，<a onclick="im.opendownpath()" href="javascript:;">打开</a>');
+				return;
+			}
+			js.msg('wait','下载中['+ret.filesizecn+'/0kb]0%...');
+			nwjs.downfile({
+				url:durl,
+				fileid:fid,
+				zte:zte,
+				filesizecn:	ret.filesizecn,
+				filename:	ret.filename,
+				filesize:parseFloat(ret.filesize),
+				savefile:savefile,
+				onjindu:function(jd,jdsize){
+					$('#icons_title_downfile').html('下载中('+jd+'%)');
+					js.msg('wait','下载中['+this.filesizecn+'/'+js.formatsize(jdsize)+']'+jd+'%...');
+					$('#'+this.zte+'').html('下载中('+jd+'%)');
+				},
+				onsuccess:function(){
+					$('#icons_title_downfile').html('下载的文件');
+					js.msg('success','下载完成，<a onclick="im.opendownpath()" href="javascript:;">打开</a>');
+					$('#'+this.zte+'').html('打开');
+				},
+				onerror:function(er){
+					js.msg('msg', er);
+					$('#'+this.zte+'').html(er);
+				}
+			});
+		},'none');
 	},
 	shownow:function(){
 		$('#datenow').html(js.now('H:i:s(周W)<br>Y-m-d'));
@@ -399,6 +449,7 @@ var im={
 	},
 	getsicons:function(a){
 		var arr = [{name:'IM交流',onclick:"$('#chatimdiv').toggle()",badgeid:'stotal_ss0',id:'im',face:'images/reim.png',num:'defim',type:0,stotal:''},{face:'images/cog.png',onclick:'im.clickcog(this,event)',name:'设置',stotal:'',type:0,id:'cog',num:'syscog'}];
+		if(nwjs.nw)arr.push({face:'images/down.png',onclick:'im.opendownfile(this,event)',name:'下载的文件',stotal:'',type:0,id:'downfile',num:'downfile'});
 		var i,len=a.length,d,d1,j;
 		for(i=0;i<len;i++){
 			d 	= a[i];d.type = 1;
@@ -423,8 +474,7 @@ var im={
 		for(i=0;i<len;i++){
 			d = a[i];
 			s1= d.stotal;if(s1==0)s1='';
-			s2= 'agentstotal_'+d.id+'';
-			if(d.badgeid)s2=d.badgeid;
+			s2= 'agentstotal_'+d.id+''; if(d.badgeid)s2=d.badgeid;
 			s3='im.openicons('+i+',event)';
 			if(d.onclick)s3=d.onclick;
 			s+='<div onclick="'+s3+'" style="top:'+t+'px;left:'+l+'px" class="os_icons">';
@@ -432,10 +482,10 @@ var im={
 			if(d.iconfont){
 				s+='		<div style="background:'+d.iconcolor+'" class="os_icons_font"><div><i class="icon iconfont icon-'+d.iconfont+'"></i></div></div>';
 			}else{
-				s+='		<img src="'+d.face+'">';
+				s+='		<img id="icons_face_'+d.num+'" src="'+d.face+'">';
 			}
 			s+='	</div>';
-			s+='	<span class="os_icons_text">'+d.name+'</span>';
+			s+='	<span id="icons_title_'+d.num+'" class="os_icons_text">'+d.name+'</span>';
 			s+='	<span id="'+s2+'" class="badge">'+s1+'</span>';
 			s+='</div>';
 			t+=jg;
@@ -507,7 +557,7 @@ var im={
 		s+='<div align="center" style="padding:10px;"><img id="myfacess" onclick="$(this).imgview()" src="'+d.face+'" height="80" width="80" style="border-radius:40px;border:1px #eeeeee solid">';
 		if(id==adminid)s+='<br><a href="javascript:;" id="fupbgonet" onclick="im.upfaceobj.click()" style="font-size:12px">修改头像</a>';
 		s+='</div>';
-		s+='<div style="line-height:25px;padding:10px;padding-left:40px;"><font color=#888888>姓名：</font>'+d.name+'<br><font color=#888888>部门：</font>'+d.deptallname+'<br><font color=#888888>职位：</font>'+d.ranking+'<br><font color=#888888>性别：</font>'+d.sex+'<br><font color=#888888>电话：</font>'+d.tel+'<br><font color=#888888>邮箱：</font>'+d.email+'</div>';
+		s+='<div style="line-height:25px;padding:10px;padding-left:40px;"><font color=#888888>姓名：</font>'+d.name+'<br><font color=#888888>部门：</font>'+d.deptallname+'<br><font color=#888888>职位：</font>'+d.ranking+'<br><font color=#888888>性别：</font>'+d.sex+'<br><font color=#888888>电话：</font>'+d.tel+'<br><font color=#888888>手机：</font>'+d.mobile+'<br><font color=#888888>邮箱：</font>'+d.email+'</div>';
 		s+='</div>';
 		js.tanbody('userziliao',''+d.name+'', 330,350,{
 			html:s
@@ -577,16 +627,25 @@ var im={
 	yiduall:function(type,gid){
 		js.ajax('reim','yiduall',{'type':type,'gid':gid},false,'none');
 	},
+	receivecmd:function(d){
+		
+	},
 	receivemesb:function(d){
 		var lx=d.type,sendid=d.adminid,num,face,ops=false,msg='',ot,ots,garr,tits,gid;
 		if(lx=='offoline'){
 			this.otherlogin();
 			return;
 		}
+		if(lx=='cmd'){
+			this.receivecmd(d);
+			return;
+		}
 		var a 	= userarr[sendid];
-		if(!a)return;
-		d.sendname=a.name;
-		d.face = a.face;gid=d.gid;
+		if(a){
+			d.sendname=a.name;
+			d.face = a.face;
+		}
+		gid = d.gid;
 		if(lx=='onoffline'){
 			if(sendid!=adminid)this.onoffline(sendid, d.cont);
 		}
@@ -751,6 +810,35 @@ var im={
 		js.tanclose('applyadd');
 		var url = ''+apiurl+'index.php?a=lu&m=input&d=flow&num='+num+'';
 		im.openurl('＋'+name, url);
+	},
+	getsavepath:function(){
+		var path = nwjsgui.App.dataPath+'\\downfile';
+		if(!nwjs.fs.existsSync(path))nwjs.fs.mkdirSync(path);  
+		var spath = js.getoption('savefilepath', path);
+		return spath;
+	},
+	opendownfile:function(o1,e){
+		var s = '<table width="100%">',key,val,i,d,oi=0;
+		s+='<tr style="border-bottom:1px #dddddd solid"><td style="padding:5px"></td><td style="padding:5px">文件名</td><td style="padding:5px">大小</td><td style="padding:5px"></td></tr>';
+		var storage = window.localStorage;
+		for (var i=0, len = storage.length; i < len; i++){
+			key = storage.key(i);
+			if(key.indexOf('downfile'+adminid+'')>0){
+				oi++;
+				val = unescape(storage.getItem(key));
+				d  = js.decode(val);
+				s+='<tr height="30" style="border-bottom:1px #dddddd solid"><td width="40" style="padding:5px" align="center">'+oi+'</td><td style="padding:5px">'+d.filename+'</td><td style="padding:5px">'+d.filesizecn+'</td><td><a id="'+key+'_zt" href="javascript:;"  onclick="im.opendownpath()">打开</a></td></tr>';
+			}
+		}
+		s+='</table>';
+		js.tanbody('downfile','下载的文件',500,310,{
+			html:'<div style="height:260px;overflow:auto">'+s+'</div>'
+		});
+		$('#msgview_downfile').html('下载路径：<input class="inputs" style="width:310px" type="text" value="'+this.getsavepath()+'">&nbsp;<a onclick="im.opendownpath()" href="javascript:;">打开</a>&nbsp; ');
+	},
+	opendownpath:function(){
+		var spath = this.getsavepath();
+		nwjsgui.Shell.openItem(spath);
 	},
 	backemts:function(s){
 		var num=nowtabs.num;
@@ -1648,9 +1736,18 @@ function agentclass(opts){
 			im.openurl(a.name, url);
 		}
 	};
-	
+	this.getfirstnum=function(){
+		var dbh = 'def',bh='';
+		var a = this.menus[0];
+		if(a){
+			bh = a.url;
+			if(a.submenu[0])bh=a.submenu[0].url;
+		}
+		if(isempt(bh))bh=dbh;
+		return bh;
+	};
 	this.initagent=function(){
-		this.getdata('def', 1);
+		this.getdata(this.getfirstnum(), 1);
 	};
 	this.loaddata=function(){
 		var url = this.receinfor.url;

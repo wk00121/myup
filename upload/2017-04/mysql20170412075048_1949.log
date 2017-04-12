@@ -1,0 +1,2 @@
+flow/flowopt/getoptnum,[错误SQL]：《SELECT count(1) FROM up_baobiao WHERE `id`='5'   and ((optid=1))》----------原因：Unknown column 'optid' in 'where clause'
+URL：a=getoptnum&m=flowopt&d=flow&ajaxbool=true&rnd=0.3179952224739677&num=baobiao&mid=5

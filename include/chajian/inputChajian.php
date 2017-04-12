@@ -111,47 +111,27 @@ class inputChajian extends Chajian
 		if($type=='textarea'){
 			$str = '<textarea class="textarea" style="height:100px" '.$attr.' name="'.$fname.'">'.$val.'</textarea>';
 		}
-		if($type=='rockcombo' || $type=='select' || $type=='checkboxall'){
+		if($type=='rockcombo' || $type=='select' || $type=='checkboxall' || $type=='radio'){
 			$str ='<select style="width:99%" '.$attr.' name="'.$fname.'" class="inputs">';
 			$str.='<option value="">-请选择-</option>';
 			$str1= '';
-			$datanum = $data;
-			if(!isempt($datanum)){
-				$fopt	= array();
-				if($objs!=null && method_exists($objs, $datanum)){
-					$fopt	= $objs->$datanum($fid,$this->mid);
-					foreach($fopt as $k=>$rs){
-						$sel = ($rs['value']==$val)?'selected':'';
-						$ocn = '';
-						foreach($rs as $k1=>$v1)if($k1!='id'&&$k1!='value'&&$k1!='name')$ocn.=' '.$k1.'="'.$v1.'"';
-						$str.='<option'.$ocn.' value="'.$rs['value'].'" '.$sel.'>'.$rs['name'].'</option>';
-						$str1.='<label><input name="'.$fname.'[]" value="'.$rs['value'].'" type="checkbox">'.$rs['name'].'</label>&nbsp;&nbsp;';
-					}
-					$fopt = true;
-				}
-				if(($type=='rockcombo' ||$type=='checkboxall') && !$fopt){
-					$_ars= explode(',', $datanum);
-					$fopt= m('option')->getselectdata($_ars[0], isset($_ars[2]));
-					$fvad= 'name';
-					if(isset($_ars[1])&&($_ars[1]=='value'||$_ars[1]=='id'||$_ars[1]=='num'))$fvad=$_ars[1];
-					foreach($fopt as $k=>$rs){
-						$cb  = $rs[$fvad];
-						$sel = ($cb==$val)?'selected':'';
-						$str.='<option value="'.$cb.'" '.$sel.'>'.$rs['name'].'</option>';
-						$str1.='<label><input name="'.$fname.'[]" value="'.$cb.'" type="checkbox">'.$rs['name'].'</label>&nbsp;&nbsp;';
-					}
-				}
-				if(($type=='select' ||$type=='checkboxall') && !$fopt){
-					$fopt= c('array')->strtoarray($datanum);
-					foreach($fopt as $k=>$rs){
-						$sel = ($rs[0]==$val)?'selected':'';
-						$str.='<option value="'.$rs[0].'" '.$sel.'>'.$rs[1].'</option>';
-						$str1.='<label><input name="'.$fname.'[]" value="'.$rs[0].'" type="checkbox">'.$rs[1].'</label>&nbsp;&nbsp;';
-					}
-				}
+			$str2= '';
+			
+			$datanum 	= $data;
+			$fopt		= $this->getdatastore($type, $objs, $datanum, $fid);
+			if($fopt)foreach($fopt as $k=>$rs){
+				$sel = ($rs['value']==$val)?'selected':'';
+				$sel2 = ($rs['value']==$val)?'checked':'';
+				$ocn = '';
+				foreach($rs as $k1=>$v1)if($k1!='id'&&$k1!='value'&&$k1!='name')$ocn.=' '.$k1.'="'.$v1.'"';
+				$str.='<option'.$ocn.' value="'.$rs['value'].'" '.$sel.'>'.$rs['name'].'</option>';
+				$str1.='<label><input name="'.$fname.'[]" value="'.$rs['value'].'" type="checkbox">'.$rs['name'].'</label>&nbsp;&nbsp;';
+				$str2.='<label><input'.$ocn.' name="'.$fname.'" '.$sel2.' value="'.$rs['value'].'" type="radio">'.$rs['name'].'</label>&nbsp;&nbsp;';
 			}
+			
 			$str.='</select>';
 			if($type=='checkboxall')$str = $str1;
+			if($type=='radio')$str = $str2;
 		}
 		
 		if($type=='datetime'||$type=='date'||$type=='time'||$type=='month'){
@@ -209,5 +189,45 @@ class inputChajian extends Chajian
 			}
 		}
 		return $str;
+	}
+	
+	
+	public function getdatastore($type, $objs, $datanum, $fid='')
+	{
+		$fopt	= array();
+		$tyepa 	= explode(',','rockcombo,select,checkboxall,radio');
+		if(!in_array($type, $tyepa))return $fopt;
+		
+		//自定义方法读取数据源
+		if(!isempt($datanum) && $objs!=null && method_exists($objs, $datanum)){
+			$fopt = $objs->$datanum($fid,$this->mid);
+			if(is_array($fopt)){
+				return $fopt;
+			}else{
+				$fopt = false;
+			}
+		}
+		if(!isempt($datanum) && ($type=='rockcombo' || $type=='checkboxall' || $type=='radio') && !$fopt){
+			$_ars = explode(',', $datanum);
+			$fopt = m('option')->getselectdata($_ars[0], isset($_ars[2]));
+			$fvad = 'name';
+			if(isset($_ars[1])&&($_ars[1]=='value'||$_ars[1]=='id'||$_ars[1]=='num'))$fvad=$_ars[1];
+			
+			if($fopt)foreach($fopt as $k=>$rs){
+				$fopt[$k]['value'] = $rs[$fvad];
+			}
+		}
+		if(!isempt($datanum) && ($type=='select' || $type=='checkboxall' || $type=='radio') && !$fopt){
+			$fopt = c('array')->strtoarray($datanum);
+			$barr = array();
+			foreach($fopt as $k=>$rs){
+				$barr[] = array(
+					'name'	=> $rs[1],
+					'value' => $rs[0],
+				);
+			}
+			$fopt = $barr;
+		}
+		return $fopt;
 	}
 }                                              

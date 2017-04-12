@@ -3,8 +3,10 @@ class deptClassAction extends apiAction
 {
 	public function dataAction()
 	{
-		$deptarr 	= m('dept')->getdata();
-		$userarr 	= m('admin')->getuser(1);
+		$udarr 		= m('dept')->getdeptuserdata();
+		$userarr 	= $udarr['uarr'];
+		$deptarr 	= $udarr['darr'];
+		
 		$grouparr 	= m('reim')->getgroup($this->adminid);
 		
 		$arr['deptjson']	= json_encode($deptarr);
@@ -18,8 +20,9 @@ class deptClassAction extends apiAction
 	*/
 	public function dataappAction()
 	{
-		$deptarr 	= m('dept')->getdata();
-		$userarr 	= m('admin')->getuser(1);
+		$udarr 		= m('dept')->getdeptuserdata();
+		$userarr 	= $udarr['uarr'];
+		$deptarr 	= $udarr['darr'];
 		$grouparr 	= m('reim')->getgroup($this->adminid);
 		
 		$arr['deptarr']	= $deptarr;

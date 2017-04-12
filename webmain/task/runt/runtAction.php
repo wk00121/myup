@@ -47,4 +47,14 @@ class runtClassAction extends runtAction
 		$this->option->setval('systaskrun', $this->now);
 		$this->returnjson($barr);
 	}
+	
+	/**
+	*	运行定时任务用于cli模式的
+	*	Linux 使用crontab php task.php runt,task
+	*	win 使用计划任务 php task.php runt,task
+	*/
+	public function taskAction()
+	{
+		echo m('task')->runjsonlist();
+	}
 }

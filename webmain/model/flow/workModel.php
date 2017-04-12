@@ -47,7 +47,7 @@ class flow_workClassModel extends flowModel
 		if(!isempt($rs['enddt']) && $zts!=1){
 			if(strtotime($rs['enddt'])<time())$str.='<font color=red>(已超期)</font>';
 		}
-		$rs['state']= $str;
+		$rs['status']= $str;
 		if($rs['score']==0)$rs['score']='';
 		if($rs['mark']==0)$rs['mark']='';
 		return $rs;

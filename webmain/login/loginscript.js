@@ -68,7 +68,7 @@ function loginsubmit(){
 			js.setoption('loginface', a.face);
 			var burl = js.request('backurl');
 			var curl = (burl=='')?'?m=index':jm.base64decode(burl);
-			js.setmsg('登录成功,<a href="'+curl+'">跳转中</a>..','green');
+			js.setmsg('登录成功,<a href="'+curl+'">跳转中</a>...','green');
 			js.location(curl);
 		}else{
 			js.setmsg(a.msg,'red');

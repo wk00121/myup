@@ -22,7 +22,7 @@ $(document).ready(function(){
 		},{
 			text:'截止时间',dataIndex:'enddt'
 		},{
-			text:'状态',dataIndex:'state',sortable:true
+			text:'状态',dataIndex:'status',sortable:true
 		},{
 			text:'分数',dataIndex:'score'
 		},{

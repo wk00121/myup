@@ -15,6 +15,19 @@ class uploadClassAction extends apiAction
 		$this->returnjson($arr);
 	}
 	
+	public function upfileappAction()
+	{
+		if(!$_FILES)$this->showreturn('', '禁止访问', 201);
+		$upimg	= c('upfile');
+		$maxsize= (int)$this->get('maxsize', $upimg->getmaxzhao());//上传最大M
+		$uptypes= '*';
+		$upimg->initupfile($uptypes, ''.UPDIR.'|'.date('Y-m').'', $maxsize);
+		$upses	= $upimg->up('file');
+		if(!is_array($upses))$this->showreturn('', $upses, 202);
+		$arr 	= c('down')->uploadback($upses);
+		$this->showreturn($arr);
+	}
+	
 	public function upcontAction()
 	{
 		$cont = $this->post('content');

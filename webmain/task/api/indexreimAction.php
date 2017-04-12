@@ -8,15 +8,18 @@ class indexreimClassAction extends apiAction
 	{
 		$viewobj 	= m('view');
 		$dbs 		= m('reim');
-		$deptarr 	= m('dept')->getdata();
-		$userarr 	= m('admin')->getuser(1);
+		
+		$udarr 		= m('dept')->getdeptuserdata();
+		$userarr 	= $udarr['uarr'];
+		$deptarr 	= $udarr['darr'];
+		
 		$grouparr 	= $dbs->getgroup($this->adminid);
 		$agentarr	= $dbs->getagent($this->adminid);
 		$historyarr	= $dbs->gethistory($this->adminid);
 		$applyarr	= m('mode')->getmoderows($this->adminid,'and islu=1');
 		$modearr	= array();
 		foreach($applyarr as $k=>$rs){
-			if(!$viewobj->isadd($rs['id'], $this->adminid))continue;
+			if(!$viewobj->isadd($rs, $this->adminid))continue;
 			$modearr[]=array('type'=>$rs['type'],'num'=>$rs['num'],'name'=>$rs['name']);
 		}
 		

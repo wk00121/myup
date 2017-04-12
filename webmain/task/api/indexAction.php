@@ -34,6 +34,7 @@ class indexClassAction extends apiAction
 		$arr['reimarr']		= $dbs->gethistory($uid);
 		$arr['agentarr']	= $agent['rows'];
 		$arr['agentstotal']	= $agent['stotal'];
+		$arr['maxupsize']	= c('upfile')->getmaxzhao();//最大上传大小M
 		$this->showreturn($arr);
 	}
 	
