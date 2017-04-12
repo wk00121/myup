@@ -13,7 +13,7 @@ class baobiaoClassAction extends Action
 			$rows[$k]['status']		= $status;
 			$dt 	= $rs['dt'];
 			if($rs['type']!=0 && !isempt($rs['enddt'])){
-				$dt.='<br><font color="#ff0000">'.$rs['enddt'].'</font>';
+				$dt.='<br><font color="#bbbbbb">'.$rs['enddt'].'</font>';
 			}
 			$rows[$k]['dt']		= $dt;
 		}

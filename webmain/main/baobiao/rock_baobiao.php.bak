@@ -6,7 +6,7 @@ $(document).ready(function(){
 	var modenum = 'baobiao';
 	var a = $('#view_{rand}').bootstable({
 		tablename:modenum,params:{'atype':atype},fanye:true,modenum:modenum,
-		modedir:'{mode}:{dir}',storeafteraction:'baobiaoafter',
+		modedir:'{mode}:{dir}',storeafteraction:'dailyafter',
 		columns:[{
 			text:'',dataIndex:'caozuo'
 		},{
@@ -30,7 +30,7 @@ $(document).ready(function(){
 				return v.replace(' ','<br>');
 			}
 		},{
-			text:'项目当前现状',dataIndex:'ustatus',align:'left'
+			text:'项目当前进展状况',dataIndex:'ustatus',align:'left'
 		},{
 			text:'下阶段进展及存在问题',dataIndex:'nextstage',align:'left'
 		},{
